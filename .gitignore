@@ -1,0 +1,6 @@
+dub.selections.json
+Debug
+Release
+*.lib
+*.obj
+*.suo

@@ -1,5 +1,7 @@
 .dub
 dub.selections.json
+*.sln
+*.visualdproj
 Debug
 Release
 *.lib

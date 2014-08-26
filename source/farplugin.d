@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 4028
+  Plugin API for Far Manager 3.0 build 4067
   License: Public Domain
 */
 
@@ -19,7 +19,7 @@ align(1) struct GUID {  // size is 16
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 4028;
+const FARMANAGERVERSION_BUILD = 4067;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const FARMACRO_KEY_EVENT = (KEY_EVENT|0x8000);
@@ -1030,6 +1030,7 @@ struct FarSetColors
 
 enum WINDOWINFO_TYPE
 {
+    WTYPE_DESKTOP                   = 0,
     WTYPE_PANELS                    = 1,
     WTYPE_VIEWER                    = 2,
     WTYPE_EDITOR                    = 3,

@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 4067
+  Plugin API for Far Manager 3.0 build 4127
   License: Public Domain
 */
 
@@ -19,7 +19,7 @@ align(1) struct GUID {  // size is 16
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 4067;
+const FARMANAGERVERSION_BUILD = 4127;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const FARMACRO_KEY_EVENT = (KEY_EVENT|0x8000);
@@ -438,7 +438,7 @@ struct FarDialogItem
     wchar_t* Data;
     size_t MaxLength; // terminate 0 not included (if == 0 string size is unlimited)
     intptr_t UserData;
-    intptr_t Reserved[2];
+    intptr_t[2] Reserved;
 }
 
 struct FarDialogItemData
@@ -521,7 +521,7 @@ struct FarMenuItem
     wchar_t* Text;
     FarKey AccelKey;
     intptr_t UserData;
-    intptr_t Reserved[2];
+    intptr_t[2] Reserved;
 }
 
 alias ulong FARMENUFLAGS;
@@ -1012,6 +1012,13 @@ struct MacroExecuteString
     FarMacroValue* InValues;
     size_t OutCount;
     FarMacroValue* OutValues;
+}
+
+struct FarMacroLoad
+{
+	size_t StructSize;
+	wchar_t* Path;
+	ulong Flags;
 }
 
 alias ulong FARSETCOLORFLAGS;

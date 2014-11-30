@@ -1,12 +1,11 @@
 /*
-  Plugin API for Far Manager 3.0 build 4127
+  Plugin API for Far Manager 3.0 build 4201
   License: Public Domain
 */
 
 module farplugin;
 
 import std.stdint;
-import core.stdc.stddef;
 import core.sys.windows.windows;
 
 align(1) struct GUID {  // size is 16
@@ -19,7 +18,7 @@ align(1) struct GUID {  // size is 16
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 4127;
+const FARMANAGERVERSION_BUILD = 4201;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const FARMACRO_KEY_EVENT = (KEY_EVENT|0x8000);
@@ -44,11 +43,21 @@ const FARCOLORFLAGS
     FCF_STYLEMASK = FCF_FG_BOLD|FCF_FG_ITALIC|FCF_FG_UNDERLINE, // 0x7000000000000000UL
     FCF_NONE = 0UL;
 
+struct rgba { byte r, g, b, a; }
+
 struct FarColor
 {
     FARCOLORFLAGS Flags;
-    COLORREF ForegroundColor;
-    COLORREF BackgroundColor;
+    union
+    {
+        COLORREF ForegroundColor;
+        rgba ForegroundRGBA;
+    }
+    union
+    {
+        COLORREF BackgroundColor;
+        rgba BackgroundRGBA;
+    }
     void* Reserved;
 }
 
@@ -68,7 +77,10 @@ void MAKE_TRANSPARENT(ARG1)(ref ARG1 x) { (x&=COLORMASK); }
 alias ulong COLORDIALOGFLAGS;
 const COLORDIALOGFLAGS CDF_NONE = 0UL;
 
-alias extern (Windows) BOOL function(GUID* PluginId, COLORDIALOGFLAGS Flags, FarColor* Color)FARAPICOLORDIALOG;
+alias extern (Windows) BOOL function(
+    in GUID* PluginId,
+    COLORDIALOGFLAGS Flags,
+    FarColor* Color) FARAPICOLORDIALOG;
 
 alias ulong FARMESSAGEFLAGS;
 const FARMESSAGEFLAGS
@@ -85,7 +97,14 @@ const FARMESSAGEFLAGS
     FMSG_MB_RETRYCANCEL      = 0x0000000000060000UL,
     FMSG_NONE                = 0UL;
 
-alias extern (Windows) intptr_t function(GUID* PluginId, GUID* Id, FARMESSAGEFLAGS Flags, wchar_t* HelpTopic, wchar_t** Items, size_t ItemsNumber, intptr_t ButtonsNumber)FARAPIMESSAGE;
+alias extern (Windows) intptr_t function(
+    in GUID* PluginId,
+    in GUID* Id,
+    FARMESSAGEFLAGS Flags,
+    in wchar* HelpTopic,
+    in wchar** Items,
+    size_t ItemsNumber,
+    intptr_t ButtonsNumber) FARAPIMESSAGE;
 
 enum FARDIALOGITEMTYPES
 {
@@ -311,7 +330,7 @@ const LISTITEMFLAGS
 struct FarListItem
 {
     LISTITEMFLAGS Flags;
-    wchar_t* Text;
+    const(wchar)* Text;
     intptr_t[2] Reserved;
 }
 
@@ -352,7 +371,7 @@ struct FarListFind
 {
     size_t StructSize;
     intptr_t StartIndex;
-    wchar_t* Pattern;
+    const(wchar)* Pattern;
     FARLISTFINDFLAGS Flags;
 }
 
@@ -402,9 +421,9 @@ struct FarListTitles
 {
     size_t StructSize;
     size_t TitleSize;
-    wchar_t* Title;
+    const(wchar)* Title;
     size_t BottomSize;
-    wchar_t* Bottom;
+    const(wchar)* Bottom;
 }
 
 struct FarDialogItemColors
@@ -432,10 +451,10 @@ struct FarDialogItem
         FAR_CHAR_INFO* VBuf;
         intptr_t Reserved0;
     }
-    wchar_t* History;
-    wchar_t* Mask;
+    const(wchar)* History;
+    const(wchar)* Mask;
     FARDIALOGITEMFLAGS Flags;
-    wchar_t* Data;
+    const(wchar)* Data;
     size_t MaxLength; // terminate 0 not included (if == 0 string size is unlimited)
     intptr_t UserData;
     intptr_t[2] Reserved;
@@ -445,7 +464,7 @@ struct FarDialogItemData
 {
     size_t StructSize;
     size_t PtrLength;
-    wchar_t* PtrData;
+    wchar* PtrData;
 }
 
 struct FarDialogEvent
@@ -493,7 +512,20 @@ alias extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Par
 
 alias extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2)FARAPIDEFDLGPROC;
 
-alias extern (Windows) HANDLE function(GUID* PluginId, GUID* Id, intptr_t X1, intptr_t Y1, intptr_t X2, intptr_t Y2, wchar_t* HelpTopic, FarDialogItem* Item, size_t ItemsNumber, intptr_t Reserved, FARDIALOGFLAGS Flags, FARWINDOWPROC DlgProc, void* Param)FARAPIDIALOGINIT;
+alias extern (Windows) HANDLE function(
+    in GUID* PluginId,
+    in GUID* Id,
+    intptr_t X1,
+    intptr_t Y1,
+    intptr_t X2,
+    intptr_t Y2,
+    in wchar* HelpTopic,
+    in FarDialogItem* Item,
+    size_t ItemsNumber,
+    intptr_t Reserved,
+    FARDIALOGFLAGS Flags,
+    FARWINDOWPROC DlgProc,
+    void* Param) FARAPIDIALOGINIT;
 
 alias extern (Windows) intptr_t function(HANDLE hDlg)FARAPIDIALOGRUN;
 
@@ -518,7 +550,7 @@ const MENUITEMFLAGS
 struct FarMenuItem
 {
     MENUITEMFLAGS Flags;
-    wchar_t* Text;
+    const(wchar)* Text;
     FarKey AccelKey;
     intptr_t UserData;
     intptr_t[2] Reserved;
@@ -533,7 +565,20 @@ const FARMENUFLAGS
     FMENU_CHANGECONSOLETITLE   = 0x0000000000000010UL,
     FMENU_NONE                 = 0UL;
 
-alias extern (Windows) intptr_t function(GUID* PluginId, GUID* Id, intptr_t X, intptr_t Y, intptr_t MaxHeight, const FARMENUFLAGS Flags, wchar_t* Title, wchar_t* Bottom, wchar_t* HelpTopic, FarKey* BreakKeys, intptr_t* BreakCode, FarMenuItem* Item, size_t ItemsNumber)FARAPIMENU;
+alias extern (Windows) intptr_t function(
+    in GUID* PluginId,
+    in GUID* Id,
+    intptr_t X,
+    intptr_t Y,
+    intptr_t MaxHeight,
+    const FARMENUFLAGS Flags,
+    in wchar* Title,
+    in wchar* Bottom,
+    in wchar* HelpTopic,
+    in FarKey* BreakKeys,
+    intptr_t* BreakCode,
+    in FarMenuItem* Item,
+    size_t ItemsNumber) FARAPIMENU;
 
 alias ulong PLUGINPANELITEMFLAGS;
 const PLUGINPANELITEMFLAGS
@@ -547,7 +592,9 @@ struct FarPanelItemFreeInfo
     HANDLE hPlugin;
 }
 
-alias extern (Windows) void function(void* UserData, FarPanelItemFreeInfo* Info)FARPANELITEMFREECALLBACK;
+alias extern (Windows) void function(
+    void* UserData,
+    in FarPanelItemFreeInfo* Info) FARPANELITEMFREECALLBACK;
 
 struct UserDataItem
 {
@@ -563,11 +610,11 @@ struct PluginPanelItem
     FILETIME ChangeTime;
     ulong FileSize;
     ulong AllocationSize;
-    wchar_t* FileName;
-    wchar_t* AlternateFileName;
-    wchar_t* Description;
-    wchar_t* Owner;
-    wchar_t** CustomColumnData;
+    const(wchar)* FileName;
+    const(wchar)* AlternateFileName;
+    const(wchar)* Description;
+    const(wchar)* Owner;
+    const(wchar*)* CustomColumnData;
     size_t CustomColumnNumber;
     PLUGINPANELITEMFLAGS Flags;
     UserDataItem UserData;
@@ -592,11 +639,11 @@ struct SortingPanelItem
 	FILETIME ChangeTime;
 	ulong FileSize;
 	ulong AllocationSize;
-	wchar_t* FileName;
-	wchar_t* AlternateFileName;
-	wchar_t* Description;
-	wchar_t* Owner;
-	wchar_t** CustomColumnData;
+	const(wchar)* FileName;
+	const(wchar)* AlternateFileName;
+	const(wchar)* Description;
+	const(wchar)* Owner;
+	const(wchar*)* CustomColumnData;
 	size_t CustomColumnNumber;
 	PLUGINPANELITEMFLAGS Flags;
 	UserDataItem UserData;
@@ -690,10 +737,10 @@ struct CmdLineSelect
 struct FarPanelDirectory
 {
     size_t StructSize;
-    wchar_t* Name;
-    wchar_t* Param;
+    const(wchar)* Name;
+    const(wchar)* Param;
     GUID PluginId;
-    wchar_t* File;
+    const(wchar)* File;
 }
 
 const PANEL_NONE = cast(HANDLE)-1;
@@ -741,15 +788,27 @@ enum FILE_CONTROL_COMMANDS
     FCTL_SETACTIVEPANEL             = 35,
 }
 
-alias extern (Windows) void function(intptr_t X, intptr_t Y, FarColor* Color, wchar_t* Str)FARAPITEXT;
+alias extern (Windows) void function(
+    intptr_t X,
+    intptr_t Y,
+    in FarColor* Color,
+    in wchar* Str) FARAPITEXT;
 
 alias extern (Windows) HANDLE function(intptr_t X1, intptr_t Y1, intptr_t X2, intptr_t Y2)FARAPISAVESCREEN;
 
 alias extern (Windows) void function(HANDLE hScreen)FARAPIRESTORESCREEN;
 
-alias extern (Windows) intptr_t function(wchar_t* Dir, PluginPanelItem** pPanelItem, size_t* pItemsNumber)FARAPIGETDIRLIST;
+alias extern (Windows) intptr_t function(
+    in wchar* Dir,
+    PluginPanelItem** pPanelItem,
+    size_t* pItemsNumber) FARAPIGETDIRLIST;
 
-alias extern (Windows) intptr_t function(GUID* PluginId, HANDLE hPanel, wchar_t* Dir, PluginPanelItem** pPanelItem, size_t* pItemsNumber)FARAPIGETPLUGINDIRLIST;
+alias extern (Windows) intptr_t function(
+    in GUID* PluginId,
+    HANDLE hPanel,
+    in wchar* Dir,
+    PluginPanelItem** pPanelItem,
+    size_t* pItemsNumber) FARAPIGETPLUGINDIRLIST;
 
 alias extern (Windows) void function(PluginPanelItem* PanelItem, size_t nItemsNumber)FARAPIFREEDIRLIST;
 
@@ -765,7 +824,15 @@ const VIEWER_FLAGS
     VF_DELETEONLYFILEONCLOSE = 0x0000000000000200UL,
     VF_NONE                  = 0UL;
 
-alias extern (Windows) intptr_t function(wchar_t* FileName, wchar_t* Title, intptr_t X1, intptr_t Y1, intptr_t X2, intptr_t Y2, VIEWER_FLAGS Flags, uintptr_t CodePage)FARAPIVIEWER;
+alias extern (Windows) intptr_t function(
+    in wchar* FileName,
+    in wchar* Title,
+    intptr_t X1,
+    intptr_t Y1,
+    intptr_t X2,
+    intptr_t Y2,
+    VIEWER_FLAGS Flags,
+    uintptr_t CodePage) FARAPIVIEWER;
 
 alias ulong EDITOR_FLAGS;
 const EDITOR_FLAGS
@@ -794,9 +861,21 @@ enum EDITOR_EXITCODE
     EEC_LOADING_INTERRUPTED = 3,
 }
 
-alias extern (Windows) intptr_t function(wchar_t* FileName, wchar_t* Title, intptr_t X1, intptr_t Y1, intptr_t X2, intptr_t Y2, EDITOR_FLAGS Flags, int StartLine, int StartChar, uintptr_t CodePage)FARAPIEDITOR;
+alias extern (Windows) intptr_t function(
+    in wchar* FileName,
+    in wchar* Title,
+    intptr_t X1,
+    intptr_t Y1,
+    intptr_t X2,
+    intptr_t Y2,
+    EDITOR_FLAGS Flags,
+    int StartLine,
+    int StartChar,
+    uintptr_t CodePage) FARAPIEDITOR;
 
-alias extern (Windows) wchar_t* function(GUID* PluginId, intptr_t MsgId)FARAPIGETMSG;
+alias extern (Windows) const(wchar)* function(
+    in GUID* PluginId,
+    intptr_t MsgId) FARAPIGETMSG;
 
 alias ulong FARHELPFLAGS;
 const FARHELPFLAGS
@@ -809,7 +888,10 @@ const FARHELPFLAGS
     FHELP_USECONTENTS = 0x0000000040000000UL,
     FHELP_NONE        = 0UL;
 
-alias extern (Windows) BOOL function(wchar_t* ModuleName, wchar_t* Topic, FARHELPFLAGS Flags)FARAPISHOWHELP;
+alias extern (Windows) BOOL function(
+    in wchar* ModuleName,
+    in wchar* Topic,
+    FARHELPFLAGS Flags) FARAPISHOWHELP;
 
 enum ADVANCED_CONTROL_COMMANDS
 {
@@ -907,7 +989,7 @@ struct MacroParseResult
     size_t StructSize;
     DWORD ErrCode;
     COORD ErrPos;
-    wchar_t* ErrSrc;
+    const(wchar)* ErrSrc;
 }
 
 struct MacroSendMacroText
@@ -915,7 +997,7 @@ struct MacroSendMacroText
     size_t StructSize;
     FARKEYMACROFLAGS Flags;
     INPUT_RECORD AKey;
-    wchar_t* SequenceText;
+    const(wchar)* SequenceText;
 }
 
 alias ulong FARADDKEYMACROFLAGS;
@@ -927,8 +1009,8 @@ struct MacroAddMacro
 {
     size_t StructSize;
     void* Id;
-    wchar_t* SequenceText;
-    wchar_t* Description;
+    const(wchar)* SequenceText;
+    const(wchar)* Description;
     FARKEYMACROFLAGS Flags;
     INPUT_RECORD AKey;
     FARMACROAREA Area;
@@ -969,7 +1051,7 @@ struct FarMacroValue
         long Integer;
         long Boolean;
         double Double;
-        wchar_t* String;
+        const(wchar)* String;
         void* Pointer;
         FarMacroValueBinary Binary;
         FarMacroValueArray Array;
@@ -981,7 +1063,7 @@ struct FarMacroValue
     this(ulong v)            { Type=FARMACROVARTYPE.FMVT_INTEGER; Integer=v; }
     this(bool v)             { Type=FARMACROVARTYPE.FMVT_BOOLEAN; Boolean=v?1:0; }
     this(double v)           { Type=FARMACROVARTYPE.FMVT_DOUBLE; Double=v; }
-    this(const wchar_t* v)   { Type=FARMACROVARTYPE.FMVT_STRING; String=cast(wchar_t*)v; }
+    this(const(wchar)* v)  { Type=FARMACROVARTYPE.FMVT_STRING; String=v; }
     this(void* v)            { Type=FARMACROVARTYPE.FMVT_POINTER; Pointer=v; }
     this(ref const GUID v)   { Type=FARMACROVARTYPE.FMVT_BINARY; Binary.Data=cast(void*)&v; Binary.Size=GUID.sizeof; }
     this(FarMacroValue* arr,size_t count) { Type=FARMACROVARTYPE.FMVT_ARRAY; Array.Values=arr; Array.Count=count; }
@@ -1007,17 +1089,17 @@ struct MacroExecuteString
 {
     size_t StructSize;
     FARKEYMACROFLAGS Flags;
-    wchar_t* SequenceText;
+    const(wchar)* SequenceText;
     size_t InCount;
     FarMacroValue* InValues;
     size_t OutCount;
-    FarMacroValue* OutValues;
+    const(FarMacroValue)* OutValues;
 }
 
 struct FarMacroLoad
 {
 	size_t StructSize;
-	wchar_t* Path;
+	const(wchar)* Path;
 	ulong Flags;
 }
 
@@ -1056,8 +1138,8 @@ struct WindowInfo
 {
     size_t StructSize;
     intptr_t Id;
-    wchar_t* TypeName;
-    wchar_t* Name;
+    wchar* TypeName;
+    wchar* Name;
     intptr_t TypeNameSize;
     intptr_t NameSize;
     intptr_t Pos;
@@ -1122,7 +1204,7 @@ struct ViewerSetMode
     union
     {
         intptr_t iParam;
-        wchar_t* wszParam;
+        wchar* wszParam;
     }
     VIEWER_SETMODEFLAGS_TYPES Flags;
 }
@@ -1282,7 +1364,7 @@ struct EditorSetParameter
     union
     {
         intptr_t iParam;
-        wchar_t* wszParam;
+        wchar* wszParam;
         intptr_t Reserved;
     }
     ulong Flags;
@@ -1308,8 +1390,8 @@ struct EditorGetString
     size_t StructSize;
     intptr_t StringNumber;
     intptr_t StringLength;
-    wchar_t* StringText;
-    wchar_t* StringEOL;
+    const(wchar)* StringText;
+    const(wchar)* StringEOL;
     intptr_t SelStart;
     intptr_t SelEnd;
 }
@@ -1319,8 +1401,8 @@ struct EditorSetString
     size_t StructSize;
     intptr_t StringNumber;
     intptr_t StringLength;
-    wchar_t* StringText;
-    wchar_t* StringEOL;
+    const(wchar)* StringText;
+    const(wchar)* StringEOL;
 }
 
 enum EXPAND_TABS
@@ -1426,7 +1508,8 @@ struct EditorConvertPos
 alias ulong EDITORCOLORFLAGS;
 const EDITORCOLORFLAGS
     ECF_TABMARKFIRST   = 0x0000000000000001UL,
-    ECF_TABMARKCURRENT = 0x0000000000000002UL;
+    ECF_TABMARKCURRENT = 0x0000000000000002UL,
+    ECF_AUTODELETE     = 0x0000000000000004UL;
 
 struct EditorColor
 {
@@ -1454,8 +1537,8 @@ const EDITOR_COLOR_NORMAL_PRIORITY = 0x80000000U;
 struct EditorSaveFile
 {
     size_t StructSize;
-    wchar_t* FileName;
-    wchar_t* FileEOL;
+    const(wchar)* FileName;
+    const(wchar)* FileEOL;
     uintptr_t CodePage;
 }
 
@@ -1491,7 +1574,17 @@ const INPUTBOXFLAGS
     FIB_EDITPATHEXEC     = 0x0000000000000080UL,
     FIB_NONE             = 0UL;
 
-alias extern (Windows) intptr_t function(GUID* PluginId, GUID* Id, wchar_t* Title, wchar_t* SubTitle, wchar_t* HistoryName, wchar_t* SrcText, wchar_t* DestText, size_t DestSize, wchar_t* HelpTopic, INPUTBOXFLAGS Flags)FARAPIINPUTBOX;
+alias extern (Windows) intptr_t function(
+    in GUID* PluginId,
+    in GUID* Id,
+    in wchar* Title,
+    in wchar* SubTitle,
+    in wchar* HistoryName,
+    in wchar* SrcText,
+    wchar* DestText,
+    size_t DestSize,
+    in wchar* HelpTopic,
+    INPUTBOXFLAGS Flags) FARAPIINPUTBOX;
 
 enum FAR_PLUGINS_CONTROL_COMMANDS
 {
@@ -1556,7 +1649,7 @@ struct RegExpMatch
 
 struct RegExpSearch
 {
-    wchar_t* Text;
+    const(wchar)* Text;
     intptr_t Position;
     intptr_t Length;
     RegExpMatch* Match;
@@ -1629,35 +1722,35 @@ struct FarSettingsCreate
 struct FarSettingsItemData
 {
     size_t Size;
-    void* Data;
+    const(void)* Data;
 }
 
 struct FarSettingsItem
 {
     size_t StructSize;
     size_t Root;
-    wchar_t* Name;
+    const(wchar)* Name;
     FARSETTINGSTYPES Type;
     union
     {
         ulong Number;
-        wchar_t* String;
+        const(wchar)* String;
         FarSettingsItemData Data;
     }
 }
 
 struct FarSettingsName
 {
-    wchar_t* Name;
+    const(wchar)* Name;
     FARSETTINGSTYPES Type;
 }
 
 struct FarSettingsHistory
 {
-    wchar_t* Name;
-    wchar_t* Param;
+    const(wchar)* Name;
+    const(wchar)* Param;
     GUID PluginId;
-    wchar_t* File;
+    const(wchar)* File;
     FILETIME Time;
     BOOL Lock;
 }
@@ -1669,8 +1762,8 @@ struct FarSettingsEnum
     size_t Count;
     union
     {
-        FarSettingsName* Items;
-        FarSettingsHistory* Histories;
+        const(FarSettingsName)* Items;
+        const(FarSettingsHistory)* Histories;
     }
 }
 
@@ -1678,18 +1771,26 @@ struct FarSettingsValue
 {
     size_t StructSize;
     size_t Root;
-    wchar_t* Value;
+    const(wchar)* Value;
 }
 
 alias extern (Windows) intptr_t function(HANDLE hPanel, FILE_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIPANELCONTROL;
 
-alias extern (Windows) intptr_t function(GUID* PluginId, ADVANCED_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIADVCONTROL;
+alias extern (Windows) intptr_t function(
+    in GUID* PluginId,
+    ADVANCED_CONTROL_COMMANDS Command,
+    intptr_t Param1,
+    void* Param2) FARAPIADVCONTROL;
 
 alias extern (Windows) intptr_t function(intptr_t ViewerID, VIEWER_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIVIEWERCONTROL;
 
 alias extern (Windows) intptr_t function(intptr_t EditorID, EDITOR_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIEDITORCONTROL;
 
-alias extern (Windows) intptr_t function(GUID* PluginId, FAR_MACRO_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIMACROCONTROL;
+alias extern (Windows) intptr_t function(
+    in GUID* PluginId,
+    FAR_MACRO_CONTROL_COMMANDS Command,
+    intptr_t Param1,
+    void* Param2) FARAPIMACROCONTROL;
 
 alias extern (Windows) intptr_t function(HANDLE hHandle, FAR_PLUGINS_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIPLUGINSCONTROL;
 
@@ -1706,71 +1807,71 @@ enum FARCLIPBOARD_TYPE
     FCT_COLUMN=2
 }
 
-alias extern (C) int function(wchar_t* Buffer, wchar_t* Format, ...)FARSTDSPRINTF;
+alias extern (C) int function(wchar* Buffer, in wchar* Format, ...) FARSTDSPRINTF;
 
-alias extern (C) int function(wchar_t* Buffer, size_t Sizebuf, wchar_t* Format, ...)FARSTDSNPRINTF;
+alias extern (C) int function(wchar* Buffer, size_t Sizebuf, in wchar* Format, ...) FARSTDSNPRINTF;
 
-alias extern (C) int function(wchar_t* Buffer, wchar_t* Format, ...)FARSTDSSCANF;
+alias extern (C) int function(in wchar* Buffer, in wchar* Format, ...) FARSTDSSCANF;
 
-alias extern (Windows) void function(void* base, size_t nelem, size_t width, int function(void* , void* , void* userparam)fcmp, void* userparam)FARSTDQSORT;
+alias extern (Windows) void function(void* base, size_t nelem, size_t width, int function(in void* , in void* , void* userparam)fcmp, void* userparam) FARSTDQSORT;
 
-alias extern (Windows) void* function(void* key, void* base, size_t nelem, size_t width, int function(void* , void* , void* userparam)fcmp, void* userparam)FARSTDBSEARCH;
+alias extern (Windows) void* function(in void* key, in void* base, size_t nelem, size_t width, int function(in void* , in void* , void* userparam)fcmp, void* userparam) FARSTDBSEARCH;
 
-alias extern (Windows) size_t function(wchar_t* Computer, wchar_t* Name, wchar_t* Owner, size_t Size)FARSTDGETFILEOWNER;
+alias extern (Windows) size_t function(in wchar* Computer, in wchar* Name, wchar* Owner, size_t Size) FARSTDGETFILEOWNER;
 
-alias extern (Windows) size_t function(wchar_t* Name)FARSTDGETNUMBEROFLINKS;
+alias extern (Windows) size_t function(in wchar* Name) FARSTDGETNUMBEROFLINKS;
 
-alias extern (Windows) int function(wchar_t* s)FARSTDATOI;
+alias extern (Windows) int function(in wchar* s) FARSTDATOI;
 
-alias extern (Windows) long function(wchar_t* s)FARSTDATOI64;
+alias extern (Windows) long function(in wchar* s) FARSTDATOI64;
 
-alias extern (Windows) wchar_t* function(long value, wchar_t* Str, int radix)FARSTDITOA64;
+alias extern (Windows) wchar* function(long value, wchar* Str, int radix)FARSTDITOA64;
 
-alias extern (Windows) wchar_t* function(int value, wchar_t* Str, int radix)FARSTDITOA;
+alias extern (Windows) wchar* function(int value, wchar* Str, int radix)FARSTDITOA;
 
-alias extern (Windows) wchar_t* function(wchar_t* Str)FARSTDLTRIM;
+alias extern (Windows) wchar* function(wchar* Str)FARSTDLTRIM;
 
-alias extern (Windows) wchar_t* function(wchar_t* Str)FARSTDRTRIM;
+alias extern (Windows) wchar* function(wchar* Str)FARSTDRTRIM;
 
-alias extern (Windows) wchar_t* function(wchar_t* Str)FARSTDTRIM;
+alias extern (Windows) wchar* function(wchar* Str)FARSTDTRIM;
 
-alias extern (Windows) wchar_t* function(wchar_t* Str, intptr_t MaxLength)FARSTDTRUNCSTR;
+alias extern (Windows) wchar* function(wchar* Str, intptr_t MaxLength)FARSTDTRUNCSTR;
 
-alias extern (Windows) wchar_t* function(wchar_t* Str, intptr_t MaxLength)FARSTDTRUNCPATHSTR;
+alias extern (Windows) wchar* function(wchar* Str, intptr_t MaxLength)FARSTDTRUNCPATHSTR;
 
-alias extern (Windows) wchar_t* function(wchar_t* Str)FARSTDQUOTESPACEONLY;
+alias extern (Windows) wchar* function(wchar* Str)FARSTDQUOTESPACEONLY;
 
-alias extern (Windows) wchar_t* function(wchar_t* Path)FARSTDPOINTTONAME;
+alias extern (Windows) const(wchar)* function(in wchar* Path) FARSTDPOINTTONAME;
 
-alias extern (Windows) BOOL function(wchar_t* Path)FARSTDADDENDSLASH;
+alias extern (Windows) BOOL function(wchar* Path)FARSTDADDENDSLASH;
 
-alias extern (Windows) BOOL function(FARCLIPBOARD_TYPE Type, wchar_t* Data)FARSTDCOPYTOCLIPBOARD;
+alias extern (Windows) BOOL function(FARCLIPBOARD_TYPE Type, in wchar* Data) FARSTDCOPYTOCLIPBOARD;
 
-alias extern (Windows) size_t function(FARCLIPBOARD_TYPE Type, wchar_t* Data, size_t Size)FARSTDPASTEFROMCLIPBOARD;
+alias extern (Windows) size_t function(FARCLIPBOARD_TYPE Type, wchar* Data, size_t Size)FARSTDPASTEFROMCLIPBOARD;
 
-alias extern (Windows) int function(wchar_t Ch)FARSTDLOCALISLOWER;
+alias extern (Windows) int function(wchar Ch)FARSTDLOCALISLOWER;
 
-alias extern (Windows) int function(wchar_t Ch)FARSTDLOCALISUPPER;
+alias extern (Windows) int function(wchar Ch)FARSTDLOCALISUPPER;
 
-alias extern (Windows) int function(wchar_t Ch)FARSTDLOCALISALPHA;
+alias extern (Windows) int function(wchar Ch)FARSTDLOCALISALPHA;
 
-alias extern (Windows) int function(wchar_t Ch)FARSTDLOCALISALPHANUM;
+alias extern (Windows) int function(wchar Ch)FARSTDLOCALISALPHANUM;
 
-alias extern (Windows) wchar_t function(wchar_t LowerChar)FARSTDLOCALUPPER;
+alias extern (Windows) wchar function(wchar LowerChar)FARSTDLOCALUPPER;
 
-alias extern (Windows) wchar_t function(wchar_t UpperChar)FARSTDLOCALLOWER;
+alias extern (Windows) wchar function(wchar UpperChar)FARSTDLOCALLOWER;
 
-alias extern (Windows) void function(wchar_t* Buf, intptr_t Length)FARSTDLOCALUPPERBUF;
+alias extern (Windows) void function(wchar* Buf, intptr_t Length)FARSTDLOCALUPPERBUF;
 
-alias extern (Windows) void function(wchar_t* Buf, intptr_t Length)FARSTDLOCALLOWERBUF;
+alias extern (Windows) void function(wchar* Buf, intptr_t Length)FARSTDLOCALLOWERBUF;
 
-alias extern (Windows) void function(wchar_t* s1)FARSTDLOCALSTRUPR;
+alias extern (Windows) void function(wchar* s1)FARSTDLOCALSTRUPR;
 
-alias extern (Windows) void function(wchar_t* s1)FARSTDLOCALSTRLWR;
+alias extern (Windows) void function(wchar* s1)FARSTDLOCALSTRLWR;
 
-alias extern (Windows) int function(wchar_t* s1, wchar_t* s2)FARSTDLOCALSTRICMP;
+alias extern (Windows) int function(in wchar* s1, in wchar* s2) FARSTDLOCALSTRICMP;
 
-alias extern (Windows) int function(wchar_t* s1, wchar_t* s2, intptr_t n)FARSTDLOCALSTRNICMP;
+alias extern (Windows) int function(in wchar* s1, in wchar* s2, intptr_t n) FARSTDLOCALSTRNICMP;
 
 alias ulong PROCESSNAME_FLAGS;
 const PROCESSNAME_FLAGS
@@ -1784,9 +1885,13 @@ const PROCESSNAME_FLAGS
     PN_SKIPPATH         = 0x0000000001000000UL,
     PN_SHOWERRORMESSAGE = 0x0000000002000000UL;
 
-alias extern (Windows) size_t function(wchar_t* param1, wchar_t* param2, size_t size, PROCESSNAME_FLAGS flags)FARSTDPROCESSNAME;
+alias extern (Windows) size_t function(
+    in wchar* param1,
+    wchar* param2,
+    size_t size,
+    PROCESSNAME_FLAGS flags) FARSTDPROCESSNAME;
 
-alias extern (Windows) void function(wchar_t* Str)FARSTDUNQUOTE;
+alias extern (Windows) void function(wchar* Str)FARSTDUNQUOTE;
 
 alias ulong XLAT_FLAGS;
 const XLAT_FLAGS
@@ -1796,13 +1901,21 @@ const XLAT_FLAGS
     XLAT_CONVERTALLCMDLINE = 0x0000000000010000UL,
     XLAT_NONE              = 0UL;
 
-alias extern (Windows) size_t function(INPUT_RECORD* Key, wchar_t* KeyText, size_t Size)FARSTDINPUTRECORDTOKEYNAME;
+alias extern (Windows) size_t function(
+    in INPUT_RECORD* Key,
+    wchar* KeyText,
+    size_t Size) FARSTDINPUTRECORDTOKEYNAME;
 
-alias extern (Windows) wchar_t* function(wchar_t* Line, intptr_t StartPos, intptr_t EndPos, XLAT_FLAGS Flags)FARSTDXLAT;
+alias extern (Windows) wchar* function(wchar* Line, intptr_t StartPos, intptr_t EndPos, XLAT_FLAGS Flags)FARSTDXLAT;
 
-alias extern (Windows) BOOL function(wchar_t* Name, INPUT_RECORD* Key)FARSTDKEYNAMETOINPUTRECORD;
+alias extern (Windows) BOOL function(
+    in wchar* Name,
+    INPUT_RECORD* Key) FARSTDKEYNAMETOINPUTRECORD;
 
-alias extern (Windows) int function(PluginPanelItem* FData, wchar_t* FullName, void* Param)FRSUSERFUNC;
+alias extern (Windows) int function(
+    in PluginPanelItem* FData,
+    in wchar* FullName,
+    void* Param) FRSUSERFUNC;
 
 alias ulong FRSMODE;
 const FRSMODE
@@ -1810,11 +1923,22 @@ const FRSMODE
     FRS_RECUR                = 0x0000000000000002UL,
     FRS_SCANSYMLINK          = 0x0000000000000004UL;
 
-alias extern (Windows) void function(wchar_t* InitDir, wchar_t* Mask, FRSUSERFUNC Func, FRSMODE Flags, void* Param)FARSTDRECURSIVESEARCH;
+alias extern (Windows) void function(
+    in wchar* InitDir,
+    in wchar* Mask,
+    FRSUSERFUNC Func,
+    FRSMODE Flags,
+    void* Param) FARSTDRECURSIVESEARCH;
 
-alias extern (Windows) size_t function(wchar_t* Dest, size_t DestSize, wchar_t* Prefix)FARSTDMKTEMP;
+alias extern (Windows) size_t function(
+    wchar* Dest,
+    size_t DestSize,
+    in wchar* Prefix) FARSTDMKTEMP;
 
-alias extern (Windows) size_t function(wchar_t* Path, wchar_t* Root, size_t DestSize)FARSTDGETPATHROOT;
+alias extern (Windows) size_t function(
+    in wchar* Path,
+    wchar* Root,
+    size_t DestSize) FARSTDGETPATHROOT;
 
 enum LINK_TYPE
 {
@@ -1833,9 +1957,16 @@ const MKLINK_FLAGS
     MLF_HOLDTARGET       = 0x0000000000040000UL,
     MLF_NONE             = 0UL;
 
-alias extern (Windows) BOOL function(wchar_t* Src, wchar_t* Dest, LINK_TYPE Type, MKLINK_FLAGS Flags)FARSTDMKLINK;
+alias extern (Windows) BOOL function(
+    in wchar* Src,
+    in wchar* Dest,
+    LINK_TYPE Type,
+    MKLINK_FLAGS Flags) FARSTDMKLINK;
 
-alias extern (Windows) size_t function(wchar_t* Src, wchar_t* Dest, size_t DestSize)FARGETREPARSEPOINTINFO;
+alias extern (Windows) size_t function(
+    in wchar* Src,
+    wchar* Dest,
+    size_t DestSize) FARGETREPARSEPOINTINFO;
 
 enum CONVERTPATHMODES
 {
@@ -1844,9 +1975,13 @@ enum CONVERTPATHMODES
     CPM_NATIVE                      = 2,
 }
 
-alias extern (Windows) size_t function(CONVERTPATHMODES Mode, wchar_t* Src, wchar_t* Dest, size_t DestSize)FARCONVERTPATH;
+alias extern (Windows) size_t function(
+    CONVERTPATHMODES Mode,
+    in wchar* Src,
+    wchar* Dest,
+    size_t DestSize) FARCONVERTPATH;
 
-alias extern (Windows) size_t function(size_t Size, wchar_t* Buffer)FARGETCURRENTDIRECTORY;
+alias extern (Windows) size_t function(size_t Size, wchar* Buffer)FARGETCURRENTDIRECTORY;
 
 alias ulong FARFORMATFILESIZEFLAGS;
 const FARFORMATFILESIZEFLAGS
@@ -1858,7 +1993,7 @@ const FARFORMATFILESIZEFLAGS
     FFFS_MINSIZEINDEX           = 0x2000000000000000UL,
     FFFS_MINSIZEINDEX_MASK      = 0x0000000000000003UL;
 
-alias extern (Windows) size_t function(ulong Size, intptr_t Width, FARFORMATFILESIZEFLAGS Flags, wchar_t* Dest, size_t DestSize)FARFORMATFILESIZE;
+alias extern (Windows) size_t function(ulong Size, intptr_t Width, FARFORMATFILESIZEFLAGS Flags, wchar* Dest, size_t DestSize)FARFORMATFILESIZE;
 
 struct FarStandardFunctions
 {
@@ -1915,7 +2050,7 @@ alias FarStandardFunctions FARSTANDARDFUNCTIONS;
 struct PluginStartupInfo
 {
     size_t StructSize;
-    wchar_t* ModuleName;
+    const(wchar)* ModuleName;
     FARAPIMENU Menu;
     FARAPIMESSAGE Message;
     FARAPIGETMSG GetMsg;
@@ -1950,19 +2085,33 @@ struct PluginStartupInfo
     void* Instance;
 }
 
-alias extern (Windows) HANDLE function(wchar_t* Object, DWORD DesiredAccess, DWORD ShareMode, LPSECURITY_ATTRIBUTES SecurityAttributes, DWORD CreationDistribution, DWORD FlagsAndAttributes, HANDLE TemplateFile)FARAPICREATEFILE;
+alias extern (Windows) HANDLE function(
+    in wchar* Object,
+    DWORD DesiredAccess,
+    DWORD ShareMode,
+    LPSECURITY_ATTRIBUTES SecurityAttributes,
+    DWORD CreationDistribution,
+    DWORD FlagsAndAttributes,
+    HANDLE TemplateFile) FARAPICREATEFILE;
 
-alias extern (Windows) DWORD function(wchar_t* FileName)FARAPIGETFILEATTRIBUTES;
+alias extern (Windows) DWORD function(in wchar* FileName) FARAPIGETFILEATTRIBUTES;
 
-alias extern (Windows) BOOL function(wchar_t* FileName, DWORD dwFileAttributes)FARAPISETFILEATTRIBUTES;
+alias extern (Windows) BOOL function(
+    in wchar* FileName,
+    DWORD dwFileAttributes) FARAPISETFILEATTRIBUTES;
 
-alias extern (Windows) BOOL function(wchar_t* ExistingFileName, wchar_t* NewFileName, DWORD dwFlags)FARAPIMOVEFILEEX;
+alias extern (Windows) BOOL function(
+    in wchar* ExistingFileName,
+    in wchar* NewFileName,
+    DWORD dwFlags) FARAPIMOVEFILEEX;
 
-alias extern (Windows) BOOL function(wchar_t* FileName)FARAPIDELETEFILE;
+alias extern (Windows) BOOL function(in wchar* FileName) FARAPIDELETEFILE;
 
-alias extern (Windows) BOOL function(wchar_t* DirName)FARAPIREMOVEDIRECTORY;
+alias extern (Windows) BOOL function(in wchar* DirName) FARAPIREMOVEDIRECTORY;
 
-alias extern (Windows) BOOL function(wchar_t* PathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes)FARAPICREATEDIRECTORY;
+alias extern (Windows) BOOL function(
+    in wchar* PathName,
+    LPSECURITY_ATTRIBUTES lpSecurityAttributes) FARAPICREATEDIRECTORY;
 
 struct ArclitePrivateInfo
 {
@@ -2018,8 +2167,8 @@ const PLUGIN_FLAGS
 
 struct PluginMenuItem
 {
-    GUID* Guids;
-    wchar_t** Strings;
+    const(GUID)* Guids;
+    const(wchar*)* Strings;
     size_t Count;
 }
 
@@ -2040,7 +2189,7 @@ struct VersionInfo
     VERSION_STAGE Stage;
 }
 
-BOOL CheckVersion(VersionInfo* Current, VersionInfo* Required)
+BOOL CheckVersion(in VersionInfo* Current, in VersionInfo* Required)
 {
     return (Current.Major > Required.Major) || (Current.Major == Required.Major && Current.Minor > Required.Minor) || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision > Required.Revision) || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision == Required.Revision && Current.Build >= Required.Build);
 }
@@ -2057,9 +2206,9 @@ struct GlobalInfo
     VersionInfo MinFarVersion;
     VersionInfo Version;
     GUID Guid;
-    wchar_t* Title;
-    wchar_t* Description;
-    wchar_t* Author;
+    const(wchar)* Title;
+    const(wchar)* Description;
+    const(wchar)* Author;
     void* Instance;
 }
 
@@ -2070,14 +2219,14 @@ struct PluginInfo
     PluginMenuItem DiskMenu;
     PluginMenuItem PluginMenu;
     PluginMenuItem PluginConfig;
-    wchar_t* CommandPrefix;
+    const(wchar)* CommandPrefix;
     void* Instance;
 }
 
 struct FarGetPluginInformation
 {
     size_t StructSize;
-    wchar_t* ModuleName;
+    const(wchar)* ModuleName;
     FAR_PLUGIN_FLAGS Flags;
     PluginInfo* PInfo;
     GlobalInfo* GInfo;
@@ -2089,8 +2238,8 @@ const INFOPANELLINE_FLAGS
 
 struct InfoPanelLine
 {
-    wchar_t* Text;
-    wchar_t* Data;
+    const(wchar)* Text;
+    const(wchar)* Data;
     INFOPANELLINE_FLAGS Flags;
 }
 
@@ -2103,11 +2252,11 @@ const PANELMODE_FLAGS
 
 struct PanelMode
 {
-    wchar_t* ColumnTypes;
-    wchar_t* ColumnWidths;
-    wchar_t** ColumnTitles;
-    wchar_t* StatusColumnTypes;
-    wchar_t* StatusColumnWidths;
+    const(wchar)* ColumnTypes;
+    const(wchar)* ColumnWidths;
+    const(wchar*)* ColumnTitles;
+    const(wchar)* StatusColumnTypes;
+    const(wchar)* StatusColumnWidths;
     PANELMODE_FLAGS Flags;
 }
 
@@ -2136,8 +2285,8 @@ const OPENPANELINFO_FLAGS
 struct KeyBarLabel
 {
     FarKey Key;
-    wchar_t* Text;
-    wchar_t* LongText;
+    const(wchar)* Text;
+    const(wchar)* LongText;
 }
 
 struct KeyBarTitles
@@ -2170,21 +2319,21 @@ struct OpenPanelInfo
     size_t StructSize;
     HANDLE hPanel;
     OPENPANELINFO_FLAGS Flags;
-    wchar_t* HostFile;
-    wchar_t* CurDir;
-    wchar_t* Format;
-    wchar_t* PanelTitle;
-    InfoPanelLine* InfoLines;
+    const(wchar)* HostFile;
+    const(wchar)* CurDir;
+    const(wchar)* Format;
+    const(wchar)* PanelTitle;
+    const(InfoPanelLine)* InfoLines;
     size_t InfoLinesNumber;
-    wchar_t** DescrFiles;
+    const(wchar*)* DescrFiles;
     size_t DescrFilesNumber;
-    PanelMode* PanelModesArray;
+    const(PanelMode)* PanelModesArray;
     size_t PanelModesNumber;
     intptr_t StartPanelMode;
     OPENPANELINFO_SORTMODES StartSortMode;
     intptr_t StartSortOrder;
-    KeyBarTitles* KeyBar;
-    wchar_t* ShortcutData;
+    const(KeyBarTitles)* KeyBar;
+    const(wchar)* ShortcutData;
     ulong FreeSize;
     UserDataItem UserData;
     void* Instance;
@@ -2193,7 +2342,7 @@ struct OpenPanelInfo
 struct AnalyseInfo
 {
     size_t StructSize;
-    wchar_t* FileName;
+    const(wchar)* FileName;
     void* Buffer;
     size_t BufferSize;
     OPERATION_MODES OpMode;
@@ -2222,15 +2371,15 @@ const FAROPENSHORTCUTFLAGS
 struct OpenShortcutInfo
 {
     size_t StructSize;
-    wchar_t* HostFile;
-    wchar_t* ShortcutData;
+    const(wchar)* HostFile;
+    const(wchar)* ShortcutData;
     FAROPENSHORTCUTFLAGS Flags;
 }
 
 struct OpenCommandLineInfo
 {
     size_t StructSize;
-    wchar_t* CommandLine;
+    const(wchar)* CommandLine;
 }
 
 enum OPENFROM
@@ -2307,7 +2456,7 @@ struct OpenInfo
 {
     size_t StructSize;
     OPENFROM OpenFrom;
-    GUID* Guid;
+    const(GUID)* Guid;
     intptr_t Data;
 	void* Instance;
 }
@@ -2316,7 +2465,7 @@ struct SetDirectoryInfo
 {
     size_t StructSize;
     HANDLE hPanel;
-    wchar_t* Dir;
+    const(wchar)* Dir;
     intptr_t Reserved;
     OPERATION_MODES OpMode;
     UserDataItem UserData;
@@ -2327,7 +2476,7 @@ struct SetFindListInfo
 {
     size_t StructSize;
     HANDLE hPanel;
-    PluginPanelItem* PanelItem;
+    const(PluginPanelItem)* PanelItem;
     size_t ItemsNumber;
 	void* Instance;
 }
@@ -2339,7 +2488,7 @@ struct PutFilesInfo
     PluginPanelItem* PanelItem;
     size_t ItemsNumber;
     BOOL Move;
-    wchar_t* SrcPath;
+    const(wchar)* SrcPath;
     OPERATION_MODES OpMode;
 	void* Instance;
 }
@@ -2358,7 +2507,7 @@ struct MakeDirectoryInfo
 {
     size_t StructSize;
     HANDLE hPanel;
-    wchar_t* Name;
+    const(wchar)* Name;
     OPERATION_MODES OpMode;
 	void* Instance;
 }
@@ -2367,8 +2516,8 @@ struct CompareInfo
 {
     size_t StructSize;
     HANDLE hPanel;
-    PluginPanelItem* Item1;
-    PluginPanelItem* Item2;
+    const(PluginPanelItem)* Item1;
+    const(PluginPanelItem)* Item2;
     OPENPANELINFO_SORTMODES Mode;
 	void* Instance;
 }
@@ -2399,7 +2548,7 @@ struct GetFilesInfo
     PluginPanelItem* PanelItem;
     size_t ItemsNumber;
     BOOL Move;
-    wchar_t* DestPath;
+    const(wchar)* DestPath;
     OPERATION_MODES OpMode;
 	void* Instance;
 }
@@ -2508,7 +2657,7 @@ struct CloseAnalyseInfo
 struct ConfigureInfo
 {
     size_t StructSize;
-    GUID* Guid;
+    const(GUID)* Guid;
 	void* Instance;
 }
 
@@ -2516,21 +2665,21 @@ GUID FarGuid = {0x00000000, 0x0000, 0x0000, [0x00,0x00, 0x00,0x00,0x00,0x00,0x00
 
 // Exported Functions
 
-extern (Windows) HANDLE AnalyseW(AnalyseInfo* Info);
+extern (Windows) HANDLE AnalyseW(in AnalyseInfo* Info);
 
-extern (Windows) void CloseAnalyseW(CloseAnalyseInfo* Info);
+extern (Windows) void CloseAnalyseW(in CloseAnalyseInfo* Info);
 
-extern (Windows) void ClosePanelW(ClosePanelInfo* Info);
+extern (Windows) void ClosePanelW(in ClosePanelInfo* Info);
 
-extern (Windows) intptr_t CompareW(CompareInfo* Info);
+extern (Windows) intptr_t CompareW(in CompareInfo* Info);
 
-extern (Windows) intptr_t ConfigureW(ConfigureInfo* Info);
+extern (Windows) intptr_t ConfigureW(in ConfigureInfo* Info);
 
-extern (Windows) intptr_t DeleteFilesW(DeleteFilesInfo* Info);
+extern (Windows) intptr_t DeleteFilesW(in DeleteFilesInfo* Info);
 
-extern (Windows) void ExitFARW(ExitInfo* Info);
+extern (Windows) void ExitFARW(in ExitInfo* Info);
 
-extern (Windows) void FreeFindDataW(FreeFindDataInfo* Info);
+extern (Windows) void FreeFindDataW(in FreeFindDataInfo* Info);
 
 extern (Windows) intptr_t GetFilesW(GetFilesInfo* Info);
 
@@ -2544,30 +2693,30 @@ extern (Windows) void GetPluginInfoW(PluginInfo* Info);
 
 extern (Windows) intptr_t MakeDirectoryW(MakeDirectoryInfo* Info);
 
-extern (Windows) HANDLE OpenW(OpenInfo* Info);
+extern (Windows) HANDLE OpenW(in OpenInfo* Info);
 
-extern (Windows) intptr_t ProcessDialogEventW(ProcessDialogEventInfo* Info);
+extern (Windows) intptr_t ProcessDialogEventW(in ProcessDialogEventInfo* Info);
 
-extern (Windows) intptr_t ProcessEditorEventW(ProcessEditorEventInfo* Info);
+extern (Windows) intptr_t ProcessEditorEventW(in ProcessEditorEventInfo* Info);
 
-extern (Windows) intptr_t ProcessEditorInputW(ProcessEditorInputInfo* Info);
+extern (Windows) intptr_t ProcessEditorInputW(in ProcessEditorInputInfo* Info);
 
-extern (Windows) intptr_t ProcessPanelEventW(ProcessPanelEventInfo* Info);
+extern (Windows) intptr_t ProcessPanelEventW(in ProcessPanelEventInfo* Info);
 
-extern (Windows) intptr_t ProcessHostFileW(ProcessHostFileInfo* Info);
+extern (Windows) intptr_t ProcessHostFileW(in ProcessHostFileInfo* Info);
 
-extern (Windows) intptr_t ProcessPanelInputW(ProcessPanelInputInfo* Info);
+extern (Windows) intptr_t ProcessPanelInputW(in ProcessPanelInputInfo* Info);
 
 extern (Windows) intptr_t ProcessConsoleInputW(ProcessConsoleInputInfo* Info);
 
-extern (Windows) intptr_t ProcessSynchroEventW(ProcessSynchroEventInfo* Info);
+extern (Windows) intptr_t ProcessSynchroEventW(in ProcessSynchroEventInfo* Info);
 
-extern (Windows) intptr_t ProcessViewerEventW(ProcessViewerEventInfo* Info);
+extern (Windows) intptr_t ProcessViewerEventW(in ProcessViewerEventInfo* Info);
 
-extern (Windows) intptr_t PutFilesW(PutFilesInfo* Info);
+extern (Windows) intptr_t PutFilesW(in PutFilesInfo* Info);
 
-extern (Windows) intptr_t SetDirectoryW(SetDirectoryInfo* Info);
+extern (Windows) intptr_t SetDirectoryW(in SetDirectoryInfo* Info);
 
-extern (Windows) intptr_t SetFindListW(SetFindListInfo* Info);
+extern (Windows) intptr_t SetFindListW(in SetFindListInfo* Info);
 
-extern (Windows) void SetStartupInfoW(PluginStartupInfo* Info);
+extern (Windows) void SetStartupInfoW(in PluginStartupInfo* Info);

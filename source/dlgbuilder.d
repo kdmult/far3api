@@ -171,7 +171,7 @@ protected:
         T* Item = &m_DialogItems [Index];
         InitDialogItem(Item, Text);
         Item.Type = Type;
-        m_Bindings [Index] = null;
+        m_Bindings [Index] = new DialogItemBinding!T;
         return Item;
     }
 
@@ -222,7 +222,7 @@ protected:
         T* Title = &m_DialogItems[0];
         intptr_t MaxWidth = MaxTextWidth();
         intptr_t MaxHeight = 0;
-        Title.X2 = Title.X1 + MaxWidth + 3;
+        Title.X2 = Title.X1 + MaxWidth - 1 + 4;
 
         for (int i=1; i<m_DialogItemsCount; i++)
         {
@@ -253,9 +253,12 @@ protected:
         for(int i=1; i<m_DialogItemsCount; i++)
         {
             if (m_DialogItems [i].X1 == SECOND_COLUMN) continue;
+            DialogItemBinding!T Binding = FindBinding(m_DialogItems+i);
             intptr_t Width = ItemWidth(m_DialogItems [i]);
-            intptr_t Indent = m_DialogItems [i].X1 - 5;
-            Width += Indent;
+            if (Binding && Binding.BeforeLabelID != -1)
+                Width += ItemWidth(m_DialogItems [Binding.BeforeLabelID]) + 1;
+            if (Binding && Binding.AfterLabelID != -1)
+                Width += 1 + ItemWidth(m_DialogItems [Binding.AfterLabelID]);
 
             if (MaxWidth < Width)
                 MaxWidth = Width;
@@ -268,14 +271,29 @@ protected:
 
     void UpdateSecondColumnPosition()
     {
-        intptr_t SecondColumnX1 = 6 + (m_DialogItems [0].X2 - m_DialogItems [0].X1 - 1)/2;
+        intptr_t SecondColumnX1 = 4 + (m_DialogItems [0].X2 - m_DialogItems [0].X1 + 1)/2;
         for(int i=0; i<m_DialogItemsCount; i++)
         {
             if (m_DialogItems [i].X1 == SECOND_COLUMN)
             {
-                intptr_t Width = m_DialogItems [i].X2 - m_DialogItems [i].X1;
-                m_DialogItems [i].X1 = SecondColumnX1;
-                m_DialogItems [i].X2 = m_DialogItems [i].X1 + Width;
+                DialogItemBinding!T Binding = FindBinding(m_DialogItems+i);
+                
+                int before = Binding.BeforeLabelID;
+                long BeforeWidth = 0;
+                if (Binding && Binding.BeforeLabelID != -1)
+                    BeforeWidth = m_DialogItems [before].X2 - m_DialogItems [before].X1 + 1 + 1;
+                
+                intptr_t Width = m_DialogItems [i].X2 - m_DialogItems [i].X1 + 1;
+                m_DialogItems [i].X1 = SecondColumnX1 + BeforeWidth;
+                m_DialogItems [i].X2 = m_DialogItems [i].X1 + Width - 1;
+
+                if (Binding && Binding.AfterLabelID != -1)
+                {
+                    int after = Binding.AfterLabelID;
+                    long AfterWidth = m_DialogItems [after].X2 - m_DialogItems [after].X1 + 1;
+                    m_DialogItems [after].X1 = m_DialogItems [i].X2 + 1 + 1;
+                    m_DialogItems [after].X2 = m_DialogItems [after].X1 + AfterWidth - 1;
+                }
             }
         }
     }
@@ -286,11 +304,13 @@ protected:
 
     int TextWidth(ref const T Item)
     {
-        return -1;
+        return 0;
     }
 
     void SetLastItemBinding(DialogItemBinding!T Binding)
     {
+        if (m_Bindings [m_DialogItemsCount-1])
+            m_Bindings [m_DialogItemsCount-1].destroy();
         m_Bindings [m_DialogItemsCount-1] = Binding;
     }
 
@@ -361,7 +381,8 @@ protected:
     {
         for (int i=0; i<m_DialogItemsCount; i++)
         {
-            m_Bindings [i].destroy();
+            if (m_Bindings [i])
+                m_Bindings [i].destroy();
         }
         m_DialogItems.destroy();
         m_Bindings.destroy();
@@ -377,9 +398,7 @@ public:
     // Добавляет статический текст, расположенный на отдельной строке в диалоге.
     T* AddText(int LabelId)
     {
-        T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_TEXT, LabelId == -1 ? "" : GetLangString(LabelId));
-        SetNextY(Item);
-        return Item;
+        return AddText(LabelId == -1 ? "" : GetLangString(LabelId));
     }
 
     // Добавляет статический текст, расположенный на отдельной строке в диалоге.
@@ -387,6 +406,7 @@ public:
     {
         T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_TEXT, Label);
         SetNextY(Item);
+        Item.X2 = Item.X1 + ItemWidth(*Item) - 1;
         return Item;
     }
 
@@ -397,7 +417,7 @@ public:
         if (ThreeState && !Mask)
             Item.Flags |= DIF_3STATE;
         SetNextY(Item);
-        Item.X2 = Item.X1 + ItemWidth(*Item);
+        Item.X2 = Item.X1 + ItemWidth(*Item) - 1;
         if (!Mask)
             Item.Selected = *Value;
         else
@@ -413,7 +433,7 @@ public:
         {
             T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_RADIOBUTTON, GetLangString(MessageIDs[i]));
             SetNextY(Item);
-            Item.X2 = Item.X1 + ItemWidth(*Item);
+            Item.X2 = Item.X1 + ItemWidth(*Item) - 1;
             if (!i)
                 Item.Flags |= DIF_GROUP;
             if (*Value == i)
@@ -445,9 +465,9 @@ public:
         Item.X1 = 5 + m_Indent;
         Item.X2 = Item.X1 + ItemWidth(*Item) - 1;
 
-        intptr_t RelativeToWidth = RelativeTo.X2 - RelativeTo.X1;
-        RelativeTo.X1 = Item.X2 + 2;
-        RelativeTo.X2 = RelativeTo.X1 + RelativeToWidth;
+        intptr_t RelativeToWidth = RelativeTo.X2 - RelativeTo.X1 + 1;
+        RelativeTo.X1 = Item.X2 + 1 + 1;
+        RelativeTo.X2 = RelativeTo.X1 + RelativeToWidth - 1;
 
         DialogItemBinding!T Binding = FindBinding(RelativeTo);
         if (Binding)
@@ -462,11 +482,12 @@ public:
     }
 
     // Добавляет указанную текстовую строку справа от элемента RelativeTo.
-    T* AddTextAfter(T* RelativeTo, in wchar* Label, int skip=1)
+    T* AddTextAfter(T* RelativeTo, in wchar* Label)
     {
         T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_TEXT, Label);
         Item.Y1 = Item.Y2 = RelativeTo.Y1;
-        Item.X1 = RelativeTo.X1 + ItemWidth(*RelativeTo) + skip;
+        Item.X1 = RelativeTo.X2 + 1 + 1;
+        Item.X2 = Item.X1 + ItemWidth(*Item) - 1;
 
         DialogItemBinding!T Binding = FindBinding(RelativeTo);
         if (Binding)
@@ -475,23 +496,29 @@ public:
         return Item;
     }
 
-    T* AddTextAfter(T* RelativeTo, int LabelId, int skip=1)
+    T* AddTextAfter(T* RelativeTo, int LabelId)
     {
-        return AddTextAfter(RelativeTo, GetLangString(LabelId), skip);
+        return AddTextAfter(RelativeTo, GetLangString(LabelId));
     }
 
     // Добавляет кнопку справа от элемента RelativeTo.
-    T* AddButtonAfter(T* RelativeTo, int LabelId)
+    T* AddButtonAfter(T* RelativeTo, in wchar* Label)
     {
-        T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_BUTTON, GetLangString(LabelId));
+        T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_BUTTON, Label);
         Item.Y1 = Item.Y2 = RelativeTo.Y1;
-        Item.X1 = RelativeTo.X1 + ItemWidth(*RelativeTo) - 1 + 2;
+        Item.X1 = RelativeTo.X2 + 1 + 1;
+        Item.X2 = Item.X1 + ItemWidth(*Item) - 1;
 
         DialogItemBinding!T Binding = FindBinding(RelativeTo);
         if (Binding)
             Binding.AfterLabelID = GetItemID(Item);
 
         return Item;
+    }
+
+    T* AddButtonAfter(T* RelativeTo, int LabelId)
+    {
+        return AddButtonAfter(RelativeTo, GetLangString(LabelId));
     }
 
     // Начинает располагать поля диалога в две колонки.
@@ -515,17 +542,30 @@ public:
         for(int i=m_ColumnStartIndex; i<m_DialogItemsCount; i++)
         {
             intptr_t Width = ItemWidth(m_DialogItems [i]);
-            if (Width > m_ColumnMinWidth)
-                m_ColumnMinWidth = Width;
+            DialogItemBinding!T Binding = FindBinding(m_DialogItems + i);
+            long BindingAdd = 0;
+            if (Binding) {
+                if (Binding.BeforeLabelID != -1)
+                    BindingAdd += ItemWidth(m_DialogItems [Binding.BeforeLabelID]) + 1;
+                if (Binding.AfterLabelID != -1)
+                    BindingAdd += 1 + ItemWidth(m_DialogItems [Binding.AfterLabelID]);
+            }
+
+            if (Width + BindingAdd > m_ColumnMinWidth)
+                m_ColumnMinWidth = Width + BindingAdd;
+
             if (i >= m_ColumnBreakIndex)
             {
                 m_DialogItems [i].X1 = SECOND_COLUMN;
-                m_DialogItems [i].X2 = SECOND_COLUMN + Width;
+                m_DialogItems [i].X2 = SECOND_COLUMN + Width - 1;
             }
         }
 
         m_ColumnStartIndex = -1;
         m_ColumnBreakIndex = -1;
+
+        if (m_NextY < m_ColumnEndY)
+            m_NextY = m_ColumnEndY;
     }
 
     // Начинает располагать поля диалога внутри single box
@@ -737,7 +777,7 @@ public:
     {
         super(aInfo, aHandle, aID);
         Value = aValue;
-        aInfo.FSF.sprintf(Buffer.ptr, "%u"w.ptr, *aValue);
+        aInfo.FSF.sprintf(Buffer.ptr, "%d"w.ptr, *aValue);
         int MaskWidth = Width < 31 ? Width : 31;
         for(int i=1; i<MaskWidth; i++)
             Mask[i] = '9';

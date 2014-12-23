@@ -130,6 +130,7 @@ protected:
     int m_ColumnStartY;
     int m_ColumnEndY;
     intptr_t m_ColumnMinWidth;
+    intptr_t m_ButtonsWidth;
 
     static const int SECOND_COLUMN = -2;
 
@@ -265,7 +266,9 @@ protected:
         }
         intptr_t ColumnsWidth = 2*m_ColumnMinWidth+1;
         if (MaxWidth < ColumnsWidth)
-            return ColumnsWidth;
+            MaxWidth = ColumnsWidth;
+        if (MaxWidth < m_ButtonsWidth)
+            MaxWidth = m_ButtonsWidth;
         return MaxWidth;
     }
 
@@ -444,6 +447,11 @@ public:
             }
             SetLastItemBinding(CreateRadioButtonBinding(Value));
         }
+    }
+
+    void AddRadioButtons(int* Value, const int[] MessageIDs, bool FocusOnSelected=false)
+    {
+        AddRadioButtons(Value, cast(int) MessageIDs.length, MessageIDs, FocusOnSelected);
     }
 
     // Добавляет поле типа FARDIALOGITEMTYPES.DI_FIXEDIT для редактирования указанного числового значения.
@@ -642,7 +650,7 @@ public:
                 NewButton.X1 = 2 + m_Indent;
                 m_FirstButtonID = m_DialogItemsCount - 1;
             }
-            NewButton.X2 = NewButton.X1 + ItemWidth(*NewButton);
+            NewButton.X2 = NewButton.X1 + ItemWidth(*NewButton) - 1 + 1;
 
             if (defaultButtonIndex == i)
             {
@@ -653,6 +661,14 @@ public:
 
             PrevButton = NewButton;
         }
+        auto Width = PrevButton.X2 - 1 - m_DialogItems [m_FirstButtonID].X1 + 1;
+        if (m_ButtonsWidth < Width)
+            m_ButtonsWidth = Width;
+    }
+
+    void AddButtons(const int[] MessageIDs, int defaultButtonIndex = 0, int cancelButtonIndex = -1)
+    {
+        AddButtons(cast(int) MessageIDs.length, MessageIDs, defaultButtonIndex, cancelButtonIndex);
     }
 
     intptr_t ShowDialogEx()
@@ -1085,19 +1101,35 @@ public:
     {
         return AddListControl(FARDIALOGITEMTYPES.DI_COMBOBOX, SelectedItem, Text, Width, 0, ItemsText, ItemCount, ItemFlags);
     }
+    FarDialogItem* AddComboBox(int* SelectedItem, wchar* Text, int Width, in wchar*[] ItemsText, FARDIALOGITEMFLAGS ItemFlags)
+    {
+        return AddComboBox(SelectedItem, Text, Width, ItemsText, ItemsText.length, ItemFlags);
+    }
 
-    FarDialogItem* AddComboBox(int* SelectedItem, wchar* Text,  int Width, const int[] MessageIDs, size_t ItemCount, FARDIALOGITEMFLAGS ItemFlags)
+    FarDialogItem* AddComboBox(int* SelectedItem, wchar* Text, int Width, const int[] MessageIDs, size_t ItemCount, FARDIALOGITEMFLAGS ItemFlags)
     {
         return AddListControl(FARDIALOGITEMTYPES.DI_COMBOBOX, SelectedItem, Text, Width, 0, MessageIDs, ItemCount, ItemFlags);
+    }
+    FarDialogItem* AddComboBox(int* SelectedItem, wchar* Text, int Width, const int[] MessageIDs, FARDIALOGITEMFLAGS ItemFlags)
+    {
+        return AddComboBox(SelectedItem, Text, Width, MessageIDs, MessageIDs.length, ItemFlags);
     }
 
     FarDialogItem* AddListBox(int* SelectedItem, int Width, int Height, in wchar*[] ItemsText, size_t ItemCount, FARDIALOGITEMFLAGS ItemFlags)
     {
         return AddListControl(FARDIALOGITEMTYPES.DI_LISTBOX, SelectedItem, null, Width, Height, ItemsText, ItemCount, ItemFlags);
     }
+    FarDialogItem* AddListBox(int* SelectedItem, int Width, int Height, in wchar*[] ItemsText, FARDIALOGITEMFLAGS ItemFlags)
+    {
+        return AddListBox(SelectedItem, Width, Height, ItemsText, ItemsText.length, ItemFlags);
+    }
 
     FarDialogItem* AddListBox(int* SelectedItem, int Width, int Height, const int[] MessageIDs, size_t ItemCount, FARDIALOGITEMFLAGS ItemFlags)
     {
         return AddListControl(FARDIALOGITEMTYPES.DI_LISTBOX, SelectedItem, null, Width, Height, MessageIDs, ItemCount, ItemFlags);
+    }
+    FarDialogItem* AddListBox(int* SelectedItem, int Width, int Height, const int[] MessageIDs, FARDIALOGITEMFLAGS ItemFlags)
+    {
+        return AddListBox(SelectedItem, Width, Height, MessageIDs, MessageIDs.length, ItemFlags);
     }
 }

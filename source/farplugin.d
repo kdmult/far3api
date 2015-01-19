@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 4201
+  Plugin API for Far Manager 3.0 build 4242
   License: Public Domain
 */
 
@@ -18,7 +18,7 @@ align(1) struct GUID {  // size is 16
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 4201;
+const FARMANAGERVERSION_BUILD = 4242;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const FARMACRO_KEY_EVENT = (KEY_EVENT|0x8000);
@@ -436,8 +436,13 @@ struct FarDialogItemColors
 
 struct FAR_CHAR_INFO
 {
-    WCHAR Char;
+    wchar Char;
     FarColor Attributes;
+
+    static FAR_CHAR_INFO make(wchar Char, in FarColor Attributes)
+    {
+        return FAR_CHAR_INFO(Char, cast(FarColor) Attributes);
+    }
 }
 
 struct FarDialogItem
@@ -2661,6 +2666,24 @@ struct ConfigureInfo
 	void* Instance;
 }
 
+struct GetContentFieldsInfo
+{
+    size_t StructSize;
+    size_t Count;
+    const(wchar*)* Names;
+    void* Instance;
+}
+
+struct GetContentDataInfo
+{
+    size_t StructSize;
+    const(wchar)* FilePath;
+    size_t Count;
+    const(wchar*)* Names;
+    const(wchar)** Values;
+    void* Instance;
+}
+
 GUID FarGuid = {0x00000000, 0x0000, 0x0000, [0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00]};
 
 // Exported Functions
@@ -2720,3 +2743,9 @@ extern (Windows) intptr_t SetDirectoryW(in SetDirectoryInfo* Info);
 extern (Windows) intptr_t SetFindListW(in SetFindListInfo* Info);
 
 extern (Windows) void SetStartupInfoW(in PluginStartupInfo* Info);
+
+extern (Windows) intptr_t GetContentFieldsW(in GetContentFieldsInfo* Info);
+
+extern (Windows) intptr_t GetContentDataW(GetContentDataInfo* Info);
+
+extern (Windows) void FreeContentDataW(in GetContentDataInfo* Info);

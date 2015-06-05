@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 4242
+  Plugin API for Far Manager 3.0 build 4389
   License: Public Domain
 */
 
@@ -18,10 +18,8 @@ align(1) struct GUID {  // size is 16
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 4242;
+const FARMANAGERVERSION_BUILD = 4389;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
-
-const FARMACRO_KEY_EVENT = (KEY_EVENT|0x8000);
 
 const CP_UNICODE    = cast(uintptr_t)1200;
 const CP_REVERSEBOM = cast(uintptr_t)1201;
@@ -242,7 +240,8 @@ enum FARMESSAGE
     DM_SETHISTORY                   = 47,
 
     DM_GETITEMPOSITION              = 48,
-    DM_SETMOUSEEVENTNOTIFY          = 49,
+    DM_SETINPUTNOTIFY               = 49,
+    DM_SETMOUSEEVENTNOTIFY          = DM_SETINPUTNOTIFY,
 
     DM_EDITUNCHANGEDFLAG            = 50,
 
@@ -1878,6 +1877,8 @@ alias extern (Windows) int function(in wchar* s1, in wchar* s2) FARSTDLOCALSTRIC
 
 alias extern (Windows) int function(in wchar* s1, in wchar* s2, intptr_t n) FARSTDLOCALSTRNICMP;
 
+alias extern (Windows) ulong function() FARSTDFARCLOCK;
+
 alias ulong PROCESSNAME_FLAGS;
 const PROCESSNAME_FLAGS
     //             0xFFFF - length
@@ -2049,6 +2050,7 @@ struct FarStandardFunctions
     FARGETREPARSEPOINTINFO GetReparsePointInfo;
     FARGETCURRENTDIRECTORY GetCurrentDirectory;
     FARFORMATFILESIZE FormatFileSize;
+    FARSTDFARCLOCK FarClock;
 }
 alias FarStandardFunctions FARSTANDARDFUNCTIONS;
 
@@ -2151,13 +2153,10 @@ struct MacroPluginReturn
 
 alias extern (Windows) intptr_t function(intptr_t CheckCode, FarMacroCall* Data) FARAPICALLFAR;
 
-alias extern (Windows) void function(MacroPluginReturn* Data, FarMacroCall** Target, int* Boolean) FARAPICALLPLUGIN;
-
 struct MacroPrivateInfo
 {
     size_t StructSize;
     FARAPICALLFAR CallFar;
-    FARAPICALLPLUGIN CallPlugin;
 }
 
 alias ulong PLUGIN_FLAGS;

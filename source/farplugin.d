@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 4400
+  Plugin API for Far Manager 3.0 build 4444
   License: Public Domain
 */
 
@@ -18,7 +18,7 @@ align(1) struct GUID {  // size is 16
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 4400;
+const FARMANAGERVERSION_BUILD = 4444;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -1065,7 +1065,7 @@ struct FarMacroValue
     this(uint v)             { Type=FARMACROVARTYPE.FMVT_INTEGER; Integer=v; }
     this(long v)             { Type=FARMACROVARTYPE.FMVT_INTEGER; Integer=v; }
     this(ulong v)            { Type=FARMACROVARTYPE.FMVT_INTEGER; Integer=v; }
-    this(bool v)             { Type=FARMACROVARTYPE.FMVT_BOOLEAN; Boolean=v?1:0; }
+    this(bool v)             { Type=FARMACROVARTYPE.FMVT_BOOLEAN; Boolean=v; }
     this(double v)           { Type=FARMACROVARTYPE.FMVT_DOUBLE; Double=v; }
     this(const(wchar)* v)  { Type=FARMACROVARTYPE.FMVT_STRING; String=v; }
     this(void* v)            { Type=FARMACROVARTYPE.FMVT_POINTER; Pointer=v; }

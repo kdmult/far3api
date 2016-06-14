@@ -2,8 +2,8 @@
 
 module wcharutil;
 
-import std.utf;
-import std.traits;
+import std.utf : toUTF16, toUTF16z;
+import std.traits : isSomeChar, isStaticArray, isArray;
 
 wchar[] toWString(S)(in S s)
     if ((is(S C : C[]) || is(S C : C*)) && isSomeChar!C)

@@ -1,5 +1,5 @@
 /*
-  Dynamic construction of dialogs for FAR Manager 3.0 build 4444
+  Dynamic construction of dialogs for FAR Manager 3.0 build 4700
 
   Original code: http://farmanager.googlecode.com/svn/trunk/plugins/common/unicode/DlgBuilder.hpp
   License: derived from original one without extra restriction
@@ -1009,7 +1009,7 @@ public:
         DlgProc = aDlgProc;
         UserParam = aUserParam;
         Flags = aFlags;
-        AddBorder(GetLangString(TitleMessageID));
+        AddBorder(PluginDialogBuilder.GetLangString(TitleMessageID));
     }
 
     this(in PluginStartupInfo* aInfo, ref const GUID aPluginId, ref const GUID aId, in wchar* TitleMessage, in wchar* aHelpTopic, FARWINDOWPROC aDlgProc=null, void* aUserParam=null, FARDIALOGFLAGS aFlags = FDLG_NONE)

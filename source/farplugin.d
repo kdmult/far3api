@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5000
+  Plugin API for Far Manager 3.0 build 5100
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5000;
+const FARMANAGERVERSION_BUILD = 5100;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -50,6 +50,28 @@ struct FarColor
         rgba BackgroundRGBA;
     }
     void* Reserved;
+
+	bool IsBg4Bit() const
+	{
+		return (Flags & FCF_BG_4BIT) != 0;
+	}
+
+	bool IsFg4Bit() const
+	{
+		return (Flags & FCF_FG_4BIT) != 0;
+	}
+
+	FarColor SetBg4Bit(bool Value)
+	{
+		Value? Flags |= FCF_BG_4BIT : Flags &= ~FCF_BG_4BIT;
+		return this;
+	}
+
+	FarColor SetFg4Bit(bool Value)
+	{
+		Value? Flags |= FCF_FG_4BIT : Flags &= ~FCF_FG_4BIT;
+		return this;
+	}
 }
 
 const INDEXMASK = 0x0000000F;
@@ -501,6 +523,7 @@ const FARDIALOGFLAGS
     FDLG_NODRAWSHADOW        = 0x0000000000000004UL,
     FDLG_NODRAWPANEL         = 0x0000000000000008UL,
     FDLG_KEEPCONSOLETITLE    = 0x0000000000000010UL,
+    FDLG_NONMODAL            = 0x0000000000000020UL,
     FDLG_NONE                = 0UL;
 
 alias extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2)FARWINDOWPROC;
@@ -947,7 +970,7 @@ enum FARMACROSENDSTRINGCOMMAND
 
 enum FARMACROAREA
 {
-    MACROAREA_OTHER                      =   0,   // Mode of copying text from the screen; vertical menus
+    MACROAREA_OTHER                      =   0,   // Reserved
     MACROAREA_SHELL                      =   1,   // File panels
     MACROAREA_VIEWER                     =   2,   // Internal viewer program
     MACROAREA_EDITOR                     =   3,   // Editor
@@ -964,6 +987,8 @@ enum FARMACROAREA
     MACROAREA_USERMENU                   =  14,   // User menu
     MACROAREA_SHELLAUTOCOMPLETION        =  15,   // Autocompletion list in command line
     MACROAREA_DIALOGAUTOCOMPLETION       =  16,   // Autocompletion list in dialogs
+    MACROAREA_GRABBER                    =  17,   // Mode of copying text from the screen
+    MACROAREA_DESKTOP                    =  18,   // Desktop
 
     MACROAREA_COMMON                     = 255,
 }
@@ -1014,6 +1039,7 @@ struct MacroAddMacro
     INPUT_RECORD AKey;
     FARMACROAREA Area;
     FARMACROCALLBACK Callback;
+    intptr_t Priority;
 }
 
 enum FARMACROVARTYPE
@@ -1126,6 +1152,8 @@ enum WINDOWINFO_TYPE
     WTYPE_VMENU                     = 5,
     WTYPE_HELP                      = 6,
     WTYPE_COMBOBOX                  = 7,
+    WTYPE_GRABBER                   = 8,
+    WTYPE_HMENU                     = 9,
 }
 
 alias ulong WINDOWINFO_FLAGS;

@@ -1,5 +1,5 @@
 /*
-  Dynamic construction of dialogs for FAR Manager 3.0 build 5000
+  Dynamic construction of dialogs for FAR Manager 3.0 build 5100
 
   Original code: http://farmanager.googlecode.com/svn/trunk/plugins/common/unicode/DlgBuilder.hpp
   License: derived from original one without extra restriction
@@ -414,9 +414,9 @@ public:
     }
 
     // Добавляет чекбокс.
-    T* AddCheckbox(int TextMessageId, int* Value, int Mask=0, bool ThreeState=false)
+    T* AddCheckbox(in wchar* TextMessage, int* Value, int Mask = 0, bool ThreeState = false)
     {
-        T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_CHECKBOX, GetLangString(TextMessageId));
+        T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_CHECKBOX, TextMessage);
         if (ThreeState && !Mask)
             Item.Flags |= DIF_3STATE;
         SetNextY(Item);
@@ -429,16 +429,26 @@ public:
         return Item;
     }
 
-    // Добавляет группу радиокнопок.
-    void AddRadioButtons(int* Value, int OptionCount, const int[] MessageIDs, bool FocusOnSelected=false)
+    // Добавляет чекбокс.
+    T* AddCheckbox(int TextMessageId, int *Value, int Mask = 0, bool ThreeState = false)
     {
-        for(int i=0; i<OptionCount; i++)
+        return AddCheckbox(GetLangString(TextMessageId), Value, Mask, ThreeState);
+    }
+
+    // Добавляет группу радиокнопок.
+    T* AddRadioButtons(int* Value, int OptionCount, const int[] MessageIDs, bool FocusOnSelected=false)
+    {
+        T* firstButton;
+        for (int i=0; i<OptionCount; i++)
         {
             T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_RADIOBUTTON, GetLangString(MessageIDs[i]));
             SetNextY(Item);
             Item.X2 = Item.X1 + ItemWidth(*Item) - 1;
             if (!i)
+            {
                 Item.Flags |= DIF_GROUP;
+                firstButton = Item;
+            }
             if (*Value == i)
             {
                 Item.Selected = TRUE;
@@ -447,6 +457,7 @@ public:
             }
             SetLastItemBinding(CreateRadioButtonBinding(Value));
         }
+        return firstButton;
     }
 
     void AddRadioButtons(int* Value, const int[] MessageIDs, bool FocusOnSelected=false)
@@ -484,6 +495,7 @@ public:
         return Item;
     }
 
+    // Добавляет указанную текстовую строку слева от элемента RelativeTo.
     T* AddTextBefore(T* RelativeTo, int LabelId)
     {
         return AddTextBefore(RelativeTo, GetLangString(LabelId));
@@ -524,6 +536,7 @@ public:
         return Item;
     }
 
+    // Добавляет кнопку справа от элемента RelativeTo.
     T* AddButtonAfter(T* RelativeTo, int LabelId)
     {
         return AddButtonAfter(RelativeTo, GetLangString(LabelId));

@@ -2,7 +2,7 @@
 
 module wcharutil;
 
-import std.utf : toUTF16, toUTF16z;
+import std.conv : to;
 import std.traits : isSomeChar, isStaticArray, isArray;
 
 wchar[] toWString(S)(in S s)
@@ -16,7 +16,7 @@ wchar[] toWString(S)(in S s)
         p = s.length;
     else
         for (; s[p]; p++) {}
-    return cast(typeof(return)) toUTF16(s[0..p]);
+    return s[0..p].to!(wchar[]);
 }
 
 unittest
@@ -29,8 +29,8 @@ unittest
         s[] = '\0';
         assert(toWString(s) == "\0\0\0\0\0"w);
         assert(toWString(s.ptr) == ""w);
-        s = "123\0""4";
-        assert(toWString(s) == "123\0"w"4"w);
+        s = "123\0" ~ "4";
+        assert(toWString(s) == "123\0"w ~ "4"w);
         assert(toWString(s.ptr) == "123"w);
         s = "abcde";
         assert(toWString(s) == "abcde"w);
@@ -61,13 +61,13 @@ const(wchar)* toWStringz(S)(in S s)
         for (; p < s.length && s[p]; p++) {}
     else
         for (; s[p]; p++) {}
-    return cast(typeof(return)) toUTF16z(s[0..p]);
+    wchar[] r = s[0..p].to!(wchar[]) ~ '\0';
+    return r.ptr;
 }
 
 unittest
 {
     import std.typetuple;
-    import std.stdio;
 
 	foreach (C; TypeTuple!(char, wchar, dchar))
 	{
@@ -94,6 +94,5 @@ unittest
         immutable(C)[] s3 = "абвгд";
         assert(toWStringz(s3)[0..6] == "абвгд\0"w);
         assert(toWStringz(s3.ptr)[0..6] == "абвгд\0"w);
-
     }
 }

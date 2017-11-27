@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 4700
+  Plugin API for Far Manager 3.0 build 5000
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 4700;
+const FARMANAGERVERSION_BUILD = 5000;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -2599,7 +2599,6 @@ struct ProcessEditorInputInfo
 
 alias ulong PROCESSCONSOLEINPUT_FLAGS;
 const PROCESSCONSOLEINPUT_FLAGS
-    PCIF_FROMMAIN = 0x0000000000000001UL,
     PCIF_NONE     = 0;
 
 struct ProcessConsoleInputInfo
@@ -2696,6 +2695,13 @@ struct GetContentDataInfo
     const(wchar*)* Names;
     const(wchar)** Values;
     void* Instance;
+}
+
+struct ErrorInfo
+{
+	size_t StructSize;
+	const(wchar)* Summary;
+	const(wchar)* Description;
 }
 
 GUID FarGuid = {0x00000000, 0x0000, 0x0000, [0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00]};

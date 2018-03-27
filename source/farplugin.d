@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5100
+  Plugin API for Far Manager 3.0 build 5151
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5100;
+const FARMANAGERVERSION_BUILD = 5151;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -684,11 +684,9 @@ const PANELINFOFLAGS
     PFLAGS_USESORTGROUPS      = 0x0000000000000008UL,
     PFLAGS_SELECTEDFIRST      = 0x0000000000000010UL,
     PFLAGS_REALNAMES          = 0x0000000000000020UL,
-    PFLAGS_NUMERICSORT        = 0x0000000000000040UL,
     PFLAGS_PANELLEFT          = 0x0000000000000080UL,
     PFLAGS_DIRECTORIESFIRST   = 0x0000000000000100UL,
     PFLAGS_USECRC32           = 0x0000000000000200UL,
-    PFLAGS_CASESENSITIVESORT  = 0x0000000000000400UL,
     PFLAGS_PLUGIN             = 0x0000000000000800UL,
     PFLAGS_VISIBLE            = 0x0000000000001000UL,
     PFLAGS_FOCUS              = 0x0000000000002000UL,
@@ -790,7 +788,6 @@ enum FILE_CONTROL_COMMANDS
     FCTL_SETCMDLINESELECTION        = 15,
     FCTL_GETCMDLINESELECTION        = 16,
     FCTL_CHECKPANELSEXIST           = 17,
-    FCTL_SETNUMERICSORT             = 18,
     FCTL_GETUSERSCREEN              = 19,
     FCTL_ISACTIVEPANEL              = 20,
     FCTL_GETPANELITEM               = 21,
@@ -805,7 +802,6 @@ enum FILE_CONTROL_COMMANDS
     FCTL_SETDIRECTORIESFIRST        = 30,
     FCTL_GETPANELFORMAT             = 31,
     FCTL_GETPANELHOSTFILE           = 32,
-    FCTL_SETCASESENSITIVESORT       = 33,
     FCTL_GETPANELPREFIX             = 34,
     FCTL_SETACTIVEPANEL             = 35,
 }
@@ -1910,11 +1906,15 @@ alias extern (Windows) void function(wchar* s1)FARSTDLOCALSTRUPR;
 
 alias extern (Windows) void function(wchar* s1)FARSTDLOCALSTRLWR;
 
+deprecated
 alias extern (Windows) int function(in wchar* s1, in wchar* s2) FARSTDLOCALSTRICMP;
 
+deprecated
 alias extern (Windows) int function(in wchar* s1, in wchar* s2, intptr_t n) FARSTDLOCALSTRNICMP;
 
 alias extern (Windows) ulong function() FARSTDFARCLOCK;
+
+alias extern (Windows) int function(in wchar* Str1, size_t Size1, in wchar* Str2, size_t Size2) FARSTDCOMPARESTRINGS;
 
 alias ulong PROCESSNAME_FLAGS;
 const PROCESSNAME_FLAGS
@@ -2063,8 +2063,8 @@ struct FarStandardFunctions
     FARSTDLOCALLOWERBUF LLowerBuf;
     FARSTDLOCALSTRUPR LStrupr;
     FARSTDLOCALSTRLWR LStrlwr;
-    FARSTDLOCALSTRICMP LStricmp;
-    FARSTDLOCALSTRNICMP LStrnicmp;
+    deprecated FARSTDLOCALSTRICMP LStricmp;
+    deprecated FARSTDLOCALSTRNICMP LStrnicmp;
     FARSTDUNQUOTE Unquote;
     FARSTDLTRIM LTrim;
     FARSTDRTRIM RTrim;
@@ -2091,6 +2091,7 @@ struct FarStandardFunctions
     FARGETCURRENTDIRECTORY GetCurrentDirectory;
     FARFORMATFILESIZE FormatFileSize;
     FARSTDFARCLOCK FarClock;
+    FARSTDCOMPARESTRINGS CompareStrings;
 }
 alias FarStandardFunctions FARSTANDARDFUNCTIONS;
 

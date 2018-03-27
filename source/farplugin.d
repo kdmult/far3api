@@ -19,7 +19,7 @@ const CP_REVERSEBOM = cast(uintptr_t)1201;
 const CP_DEFAULT    = cast(uintptr_t)-1;
 const CP_REDETECT   = cast(uintptr_t)-2;
 
-alias ulong FARCOLORFLAGS;
+alias FARCOLORFLAGS = ulong;
 const FARCOLORFLAGS
     FCF_FG_4BIT = 0x0000000000000001UL,
     FCF_BG_4BIT = 0x0000000000000002UL,
@@ -87,15 +87,15 @@ auto IS_TRANSPARENT(ARG1)(ARG1 x) { return (!ALPHAVALUE(x)); }
 void MAKE_OPAQUE(ARG1)(ref ARG1 x) { (x|=ALPHAMASK); }
 void MAKE_TRANSPARENT(ARG1)(ref ARG1 x) { (x&=COLORMASK); }
 
-alias ulong COLORDIALOGFLAGS;
+alias COLORDIALOGFLAGS = ulong;
 const COLORDIALOGFLAGS CDF_NONE = 0UL;
 
-alias extern (Windows) BOOL function(
+alias FARAPICOLORDIALOG = extern (Windows) BOOL function(
     in GUID* PluginId,
     COLORDIALOGFLAGS Flags,
-    FarColor* Color) FARAPICOLORDIALOG;
+    FarColor* Color);
 
-alias ulong FARMESSAGEFLAGS;
+alias FARMESSAGEFLAGS = ulong;
 const FARMESSAGEFLAGS
     FMSG_WARNING             = 0x0000000000000001UL,
     FMSG_ERRORTYPE           = 0x0000000000000002UL,
@@ -110,14 +110,14 @@ const FARMESSAGEFLAGS
     FMSG_MB_RETRYCANCEL      = 0x0000000000060000UL,
     FMSG_NONE                = 0UL;
 
-alias extern (Windows) intptr_t function(
+alias FARAPIMESSAGE = extern (Windows) intptr_t function(
     in GUID* PluginId,
     in GUID* Id,
     FARMESSAGEFLAGS Flags,
     in wchar* HelpTopic,
     in wchar** Items,
     size_t ItemsNumber,
-    intptr_t ButtonsNumber) FARAPIMESSAGE;
+    intptr_t ButtonsNumber);
 
 enum FARDIALOGITEMTYPES
 {
@@ -156,7 +156,7 @@ BOOL  IsEdit(FARDIALOGITEMTYPES Type)
         }
 }
 
-alias ulong FARDIALOGITEMFLAGS;
+alias FARDIALOGITEMFLAGS = ulong;
 const FARDIALOGITEMFLAGS
     DIF_BOXCOLOR              = 0x0000000000000200UL,
     DIF_GROUP                 = 0x0000000000000400UL,
@@ -330,7 +330,7 @@ enum FARCOMBOBOXEVENTTYPE
     CBET_MOUSE       = 0x00000002,
 }
 
-alias ulong LISTITEMFLAGS;
+alias LISTITEMFLAGS = ulong;
 const LISTITEMFLAGS
     LIF_SELECTED           = 0x0000000000010000UL,
     LIF_CHECKED            = 0x0000000000020000UL,
@@ -376,7 +376,7 @@ struct FarListPos
     intptr_t TopPos;
 }
 
-alias ulong FARLISTFINDFLAGS;
+alias FARLISTFINDFLAGS = ulong;
 const FARLISTFINDFLAGS
     LIFIND_EXACTMATCH = 0x0000000000000001UL,
     LIFIND_NONE       = 0UL;
@@ -396,7 +396,7 @@ struct FarListDelete
     intptr_t Count;
 }
 
-alias ulong FARLISTINFOFLAGS;
+alias FARLISTINFOFLAGS = ulong;
 const FARLISTINFOFLAGS
     LINFO_SHOWNOBOX             = 0x0000000000000400UL,
     LINFO_AUTOHIGHLIGHT         = 0x0000000000000800UL,
@@ -516,7 +516,7 @@ struct FarGetDialogItem
     FarDialogItem* Item;
 }
 
-alias ulong FARDIALOGFLAGS;
+alias FARDIALOGFLAGS = ulong;
 const FARDIALOGFLAGS
     FDLG_WARNING             = 0x0000000000000001UL,
     FDLG_SMALLDIALOG         = 0x0000000000000002UL,
@@ -526,13 +526,13 @@ const FARDIALOGFLAGS
     FDLG_NONMODAL            = 0x0000000000000020UL,
     FDLG_NONE                = 0UL;
 
-alias extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2)FARWINDOWPROC;
+alias FARWINDOWPROC = extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2)FARAPISENDDLGMESSAGE;
+alias FARAPISENDDLGMESSAGE = extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2)FARAPIDEFDLGPROC;
+alias FARAPIDEFDLGPROC = extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2);
 
-alias extern (Windows) HANDLE function(
+alias FARAPIDIALOGINIT = extern (Windows) HANDLE function(
     in GUID* PluginId,
     in GUID* Id,
     intptr_t X1,
@@ -545,11 +545,11 @@ alias extern (Windows) HANDLE function(
     intptr_t Reserved,
     FARDIALOGFLAGS Flags,
     FARWINDOWPROC DlgProc,
-    void* Param) FARAPIDIALOGINIT;
+    void* Param);
 
-alias extern (Windows) intptr_t function(HANDLE hDlg)FARAPIDIALOGRUN;
+alias FARAPIDIALOGRUN = extern (Windows) intptr_t function(HANDLE hDlg);
 
-alias extern (Windows) void function(HANDLE hDlg)FARAPIDIALOGFREE;
+alias FARAPIDIALOGFREE = extern (Windows) void function(HANDLE hDlg);
 
 struct FarKey
 {
@@ -557,7 +557,7 @@ struct FarKey
     DWORD ControlKeyState;
 }
 
-alias ulong MENUITEMFLAGS;
+alias MENUITEMFLAGS = ulong;
 const MENUITEMFLAGS
     MIF_SELECTED   = 0x000000000010000UL,
     MIF_CHECKED    = 0x000000000020000UL,
@@ -576,7 +576,7 @@ struct FarMenuItem
     intptr_t[2] Reserved;
 }
 
-alias ulong FARMENUFLAGS;
+alias FARMENUFLAGS = ulong;
 const FARMENUFLAGS
     FMENU_SHOWAMPERSAND        = 0x0000000000000001UL,
     FMENU_WRAPMODE             = 0x0000000000000002UL,
@@ -585,7 +585,7 @@ const FARMENUFLAGS
     FMENU_CHANGECONSOLETITLE   = 0x0000000000000010UL,
     FMENU_NONE                 = 0UL;
 
-alias extern (Windows) intptr_t function(
+alias FARAPIMENU = extern (Windows) intptr_t function(
     in GUID* PluginId,
     in GUID* Id,
     intptr_t X,
@@ -598,9 +598,9 @@ alias extern (Windows) intptr_t function(
     in FarKey* BreakKeys,
     intptr_t* BreakCode,
     in FarMenuItem* Item,
-    size_t ItemsNumber) FARAPIMENU;
+    size_t ItemsNumber);
 
-alias ulong PLUGINPANELITEMFLAGS;
+alias PLUGINPANELITEMFLAGS = ulong;
 const PLUGINPANELITEMFLAGS
     PPIF_SELECTED               = 0x0000000040000000UL,
     PPIF_PROCESSDESCR           = 0x0000000080000000UL,
@@ -612,9 +612,9 @@ struct FarPanelItemFreeInfo
     HANDLE hPlugin;
 }
 
-alias extern (Windows) void function(
+alias FARPANELITEMFREECALLBACK = extern (Windows) void function(
     void* UserData,
-    in FarPanelItemFreeInfo* Info) FARPANELITEMFREECALLBACK;
+    in FarPanelItemFreeInfo* Info);
 
 struct UserDataItem
 {
@@ -676,7 +676,7 @@ struct SortingPanelItem
 	ulong StreamsSize;
 }
 
-alias ulong PANELINFOFLAGS;
+alias PANELINFOFLAGS = ulong;
 const PANELINFOFLAGS
     PFLAGS_SHOWHIDDEN         = 0x0000000000000001UL,
     PFLAGS_HIGHLIGHT          = 0x0000000000000002UL,
@@ -806,33 +806,33 @@ enum FILE_CONTROL_COMMANDS
     FCTL_SETACTIVEPANEL             = 35,
 }
 
-alias extern (Windows) void function(
+alias FARAPITEXT = extern (Windows) void function(
     intptr_t X,
     intptr_t Y,
     in FarColor* Color,
-    in wchar* Str) FARAPITEXT;
+    in wchar* Str);
 
-alias extern (Windows) HANDLE function(intptr_t X1, intptr_t Y1, intptr_t X2, intptr_t Y2)FARAPISAVESCREEN;
+alias FARAPISAVESCREEN = extern (Windows) HANDLE function(intptr_t X1, intptr_t Y1, intptr_t X2, intptr_t Y2);
 
-alias extern (Windows) void function(HANDLE hScreen)FARAPIRESTORESCREEN;
+alias FARAPIRESTORESCREEN = extern (Windows) void function(HANDLE hScreen);
 
-alias extern (Windows) intptr_t function(
+alias FARAPIGETDIRLIST = extern (Windows) intptr_t function(
     in wchar* Dir,
     PluginPanelItem** pPanelItem,
-    size_t* pItemsNumber) FARAPIGETDIRLIST;
+    size_t* pItemsNumber);
 
-alias extern (Windows) intptr_t function(
+alias FARAPIGETPLUGINDIRLIST = extern (Windows) intptr_t function(
     in GUID* PluginId,
     HANDLE hPanel,
     in wchar* Dir,
     PluginPanelItem** pPanelItem,
-    size_t* pItemsNumber) FARAPIGETPLUGINDIRLIST;
+    size_t* pItemsNumber);
 
-alias extern (Windows) void function(PluginPanelItem* PanelItem, size_t nItemsNumber)FARAPIFREEDIRLIST;
+alias FARAPIFREEDIRLIST = extern (Windows) void function(PluginPanelItem* PanelItem, size_t nItemsNumber);
 
-alias extern (Windows) void function(HANDLE hPanel, PluginPanelItem* PanelItem, size_t nItemsNumber)FARAPIFREEPLUGINDIRLIST;
+alias FARAPIFREEPLUGINDIRLIST = extern (Windows) void function(HANDLE hPanel, PluginPanelItem* PanelItem, size_t nItemsNumber);
 
-alias ulong VIEWER_FLAGS;
+alias VIEWER_FLAGS = ulong;
 const VIEWER_FLAGS
     VF_NONMODAL              = 0x0000000000000001UL,
     VF_DELETEONCLOSE         = 0x0000000000000002UL,
@@ -842,7 +842,7 @@ const VIEWER_FLAGS
     VF_DELETEONLYFILEONCLOSE = 0x0000000000000200UL,
     VF_NONE                  = 0UL;
 
-alias extern (Windows) intptr_t function(
+alias FARAPIVIEWER = extern (Windows) intptr_t function(
     in wchar* FileName,
     in wchar* Title,
     intptr_t X1,
@@ -850,9 +850,9 @@ alias extern (Windows) intptr_t function(
     intptr_t X2,
     intptr_t Y2,
     VIEWER_FLAGS Flags,
-    uintptr_t CodePage) FARAPIVIEWER;
+    uintptr_t CodePage);
 
-alias ulong EDITOR_FLAGS;
+alias EDITOR_FLAGS = ulong;
 const EDITOR_FLAGS
     EF_NONMODAL              = 0x0000000000000001UL,
     EF_CREATENEW             = 0x0000000000000002UL,
@@ -879,7 +879,7 @@ enum EDITOR_EXITCODE
     EEC_LOADING_INTERRUPTED = 3,
 }
 
-alias extern (Windows) intptr_t function(
+alias FARAPIEDITOR = extern (Windows) intptr_t function(
     in wchar* FileName,
     in wchar* Title,
     intptr_t X1,
@@ -889,13 +889,13 @@ alias extern (Windows) intptr_t function(
     EDITOR_FLAGS Flags,
     int StartLine,
     int StartChar,
-    uintptr_t CodePage) FARAPIEDITOR;
+    uintptr_t CodePage);
 
-alias extern (Windows) const(wchar)* function(
+alias FARAPIGETMSG = extern (Windows) const(wchar)* function(
     in GUID* PluginId,
-    intptr_t MsgId) FARAPIGETMSG;
+    intptr_t MsgId);
 
-alias ulong FARHELPFLAGS;
+alias FARHELPFLAGS = ulong;
 const FARHELPFLAGS
     FHELP_NOSHOWERROR = 0x0000000080000000UL,
     FHELP_SELFHELP    = 0x0000000000000000UL,
@@ -906,10 +906,10 @@ const FARHELPFLAGS
     FHELP_USECONTENTS = 0x0000000040000000UL,
     FHELP_NONE        = 0UL;
 
-alias extern (Windows) BOOL function(
+alias FARAPISHOWHELP = extern (Windows) BOOL function(
     in wchar* ModuleName,
     in wchar* Topic,
-    FARHELPFLAGS Flags) FARAPISHOWHELP;
+    FARHELPFLAGS Flags);
 
 enum ADVANCED_CONTROL_COMMANDS
 {
@@ -948,7 +948,7 @@ enum FAR_MACRO_CONTROL_COMMANDS
     MCTL_EXECSTRING        = 10,
 }
 
-alias ulong FARKEYMACROFLAGS;
+alias FARKEYMACROFLAGS = ulong;
 const FARKEYMACROFLAGS
     KMFLAGS_SILENTCHECK         = 0x0000000000000001UL,
     KMFLAGS_NOSENDKEYSTOPLUGINS = 0x0000000000000002UL,
@@ -1020,10 +1020,10 @@ struct MacroSendMacroText
     const(wchar)* SequenceText;
 }
 
-alias ulong FARADDKEYMACROFLAGS;
+alias FARADDKEYMACROFLAGS = ulong;
 const FARADDKEYMACROFLAGS AKMFLAGS_NONE = 0UL;
 
-alias extern (Windows) intptr_t function(void* Id, FARADDKEYMACROFLAGS Flags)FARMACROCALLBACK;
+alias FARMACROCALLBACK = extern (Windows) intptr_t function(void* Id, FARADDKEYMACROFLAGS Flags);
 
 struct MacroAddMacro
 {
@@ -1124,7 +1124,7 @@ struct FarMacroLoad
 	ulong Flags;
 }
 
-alias ulong FARSETCOLORFLAGS;
+alias FARSETCOLORFLAGS = ulong;
 const FARSETCOLORFLAGS
     FSETCLR_REDRAW                 = 0x0000000000000001UL,
     FSETCLR_NONE                   = 0UL;
@@ -1152,7 +1152,7 @@ enum WINDOWINFO_TYPE
     WTYPE_HMENU                     = 9,
 }
 
-alias ulong WINDOWINFO_FLAGS;
+alias WINDOWINFO_FLAGS = ulong;
 const WINDOWINFO_FLAGS
     WIF_MODIFIED = 0x0000000000000001UL,
     WIF_CURRENT  = 0x0000000000000002UL,
@@ -1206,7 +1206,7 @@ enum VIEWER_CONTROL_COMMANDS
     VCTL_GETFILENAME                = 7,
 }
 
-alias ulong VIEWER_OPTIONS;
+alias VIEWER_OPTIONS = ulong;
 const VIEWER_OPTIONS
     VOPT_SAVEFILEPOSITION   = 0x0000000000000001UL,
     VOPT_AUTODETECTCODEPAGE = 0x0000000000000002UL,
@@ -1223,7 +1223,7 @@ enum VIEWER_SETMODE_TYPES
     VSMT_WORDWRAP                   = 2,
 }
 
-alias ulong VIEWER_SETMODEFLAGS_TYPES;
+alias VIEWER_SETMODEFLAGS_TYPES = ulong;
 const VIEWER_SETMODEFLAGS_TYPES
     VSMFL_REDRAW    = 0x0000000000000001UL,
     VSMFL_NONE      = 0;
@@ -1247,7 +1247,7 @@ struct ViewerSelect
     long BlockLen;
 }
 
-alias ulong VIEWER_SETPOS_FLAGS;
+alias VIEWER_SETPOS_FLAGS = ulong;
 const VIEWER_SETPOS_FLAGS
     VSP_NOREDRAW    = 0x0000000000000001UL,
     VSP_PERCENT     = 0x0000000000000002UL,
@@ -1263,7 +1263,7 @@ struct ViewerSetPosition
     long LeftPos;
 }
 
-alias ulong VIEWER_MODE_FLAGS;
+alias VIEWER_MODE_FLAGS = ulong;
 const VIEWER_MODE_FLAGS
     VMF_WRAP     = 0x0000000000000001UL,
     VMF_WORDWRAP = 0x0000000000000002UL,
@@ -1541,7 +1541,7 @@ struct EditorConvertPos
 }
 
 
-alias ulong EDITORCOLORFLAGS;
+alias EDITORCOLORFLAGS = ulong;
 const EDITORCOLORFLAGS
     ECF_TABMARKFIRST   = 0x0000000000000001UL,
     ECF_TABMARKCURRENT = 0x0000000000000002UL,
@@ -1599,7 +1599,7 @@ struct EditorSubscribeChangeEvent
     GUID PluginId;
 }
 
-alias ulong INPUTBOXFLAGS;
+alias INPUTBOXFLAGS = ulong;
 const INPUTBOXFLAGS
     FIB_ENABLEEMPTY      = 0x0000000000000001UL,
     FIB_PASSWORD         = 0x0000000000000002UL,
@@ -1611,7 +1611,7 @@ const INPUTBOXFLAGS
     FIB_EDITPATHEXEC     = 0x0000000000000080UL,
     FIB_NONE             = 0UL;
 
-alias extern (Windows) intptr_t function(
+alias FARAPIINPUTBOX = extern (Windows) intptr_t function(
     in GUID* PluginId,
     in GUID* Id,
     in wchar* Title,
@@ -1621,7 +1621,7 @@ alias extern (Windows) intptr_t function(
     wchar* DestText,
     size_t DestSize,
     in wchar* HelpTopic,
-    INPUTBOXFLAGS Flags) FARAPIINPUTBOX;
+    INPUTBOXFLAGS Flags);
 
 enum FAR_PLUGINS_CONTROL_COMMANDS
 {
@@ -1644,7 +1644,7 @@ enum FAR_PLUGIN_FIND_TYPE
     PFM_MODULENAME = 1,
 }
 
-alias ulong FAR_PLUGIN_FLAGS;
+alias FAR_PLUGIN_FLAGS = ulong;
 const FAR_PLUGIN_FLAGS
     FPF_LOADED         = 0x0000000000000001UL,
     FPF_ANSI           = 0x1000000000000000UL,
@@ -1811,31 +1811,31 @@ struct FarSettingsValue
     const(wchar)* Value;
 }
 
-alias extern (Windows) intptr_t function(HANDLE hPanel, FILE_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIPANELCONTROL;
+alias FARAPIPANELCONTROL = extern (Windows) intptr_t function(HANDLE hPanel, FILE_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(
+alias FARAPIADVCONTROL = extern (Windows) intptr_t function(
     in GUID* PluginId,
     ADVANCED_CONTROL_COMMANDS Command,
     intptr_t Param1,
-    void* Param2) FARAPIADVCONTROL;
+    void* Param2);
 
-alias extern (Windows) intptr_t function(intptr_t ViewerID, VIEWER_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIVIEWERCONTROL;
+alias FARAPIVIEWERCONTROL = extern (Windows) intptr_t function(intptr_t ViewerID, VIEWER_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(intptr_t EditorID, EDITOR_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIEDITORCONTROL;
+alias FARAPIEDITORCONTROL = extern (Windows) intptr_t function(intptr_t EditorID, EDITOR_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(
+alias FARAPIMACROCONTROL = extern (Windows) intptr_t function(
     in GUID* PluginId,
     FAR_MACRO_CONTROL_COMMANDS Command,
     intptr_t Param1,
-    void* Param2) FARAPIMACROCONTROL;
+    void* Param2);
 
-alias extern (Windows) intptr_t function(HANDLE hHandle, FAR_PLUGINS_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIPLUGINSCONTROL;
+alias FARAPIPLUGINSCONTROL = extern (Windows) intptr_t function(HANDLE hHandle, FAR_PLUGINS_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(HANDLE hHandle, FAR_FILE_FILTER_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIFILEFILTERCONTROL;
+alias FARAPIFILEFILTERCONTROL = extern (Windows) intptr_t function(HANDLE hHandle, FAR_FILE_FILTER_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(HANDLE hHandle, FAR_REGEXP_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPIREGEXPCONTROL;
+alias FARAPIREGEXPCONTROL = extern (Windows) intptr_t function(HANDLE hHandle, FAR_REGEXP_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
-alias extern (Windows) intptr_t function(HANDLE hHandle, FAR_SETTINGS_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2)FARAPISETTINGSCONTROL;
+alias FARAPISETTINGSCONTROL = extern (Windows) intptr_t function(HANDLE hHandle, FAR_SETTINGS_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
 enum FARCLIPBOARD_TYPE
 {
@@ -1844,79 +1844,79 @@ enum FARCLIPBOARD_TYPE
     FCT_COLUMN=2
 }
 
-alias extern (C) int function(wchar* Buffer, in wchar* Format, ...) FARSTDSPRINTF;
+alias FARSTDSPRINTF = extern (C) int function(wchar* Buffer, in wchar* Format, ...);
 
-alias extern (C) int function(wchar* Buffer, size_t Sizebuf, in wchar* Format, ...) FARSTDSNPRINTF;
+alias FARSTDSNPRINTF = extern (C) int function(wchar* Buffer, size_t Sizebuf, in wchar* Format, ...);
 
-alias extern (C) int function(in wchar* Buffer, in wchar* Format, ...) FARSTDSSCANF;
+alias FARSTDSSCANF = extern (C) int function(in wchar* Buffer, in wchar* Format, ...);
 
-alias extern (Windows) void function(void* base, size_t nelem, size_t width, int function(in void* , in void* , void* userparam)fcmp, void* userparam) FARSTDQSORT;
+alias FARSTDQSORT = extern (Windows) void function(void* base, size_t nelem, size_t width, int function(in void* , in void* , void* userparam)fcmp, void* userparam);
 
-alias extern (Windows) void* function(in void* key, in void* base, size_t nelem, size_t width, int function(in void* , in void* , void* userparam)fcmp, void* userparam) FARSTDBSEARCH;
+alias FARSTDBSEARCH = extern (Windows) void* function(in void* key, in void* base, size_t nelem, size_t width, int function(in void* , in void* , void* userparam)fcmp, void* userparam);
 
-alias extern (Windows) size_t function(in wchar* Computer, in wchar* Name, wchar* Owner, size_t Size) FARSTDGETFILEOWNER;
+alias FARSTDGETFILEOWNER = extern (Windows) size_t function(in wchar* Computer, in wchar* Name, wchar* Owner, size_t Size);
 
-alias extern (Windows) size_t function(in wchar* Name) FARSTDGETNUMBEROFLINKS;
+alias FARSTDGETNUMBEROFLINKS = extern (Windows) size_t function(in wchar* Name);
 
-alias extern (Windows) int function(in wchar* s) FARSTDATOI;
+alias FARSTDATOI = extern (Windows) int function(in wchar* s);
 
-alias extern (Windows) long function(in wchar* s) FARSTDATOI64;
+alias FARSTDATOI64 = extern (Windows) long function(in wchar* s);
 
-alias extern (Windows) wchar* function(long value, wchar* Str, int radix)FARSTDITOA64;
+alias FARSTDITOA64 = extern (Windows) wchar* function(long value, wchar* Str, int radix);
 
-alias extern (Windows) wchar* function(int value, wchar* Str, int radix)FARSTDITOA;
+alias FARSTDITOA = extern (Windows) wchar* function(int value, wchar* Str, int radix);
 
-alias extern (Windows) wchar* function(wchar* Str)FARSTDLTRIM;
+alias FARSTDLTRIM = extern (Windows) wchar* function(wchar* Str);
 
-alias extern (Windows) wchar* function(wchar* Str)FARSTDRTRIM;
+alias FARSTDRTRIM = extern (Windows) wchar* function(wchar* Str);
 
-alias extern (Windows) wchar* function(wchar* Str)FARSTDTRIM;
+alias FARSTDTRIM = extern (Windows) wchar* function(wchar* Str);
 
-alias extern (Windows) wchar* function(wchar* Str, intptr_t MaxLength)FARSTDTRUNCSTR;
+alias FARSTDTRUNCSTR = extern (Windows) wchar* function(wchar* Str, intptr_t MaxLength);
 
-alias extern (Windows) wchar* function(wchar* Str, intptr_t MaxLength)FARSTDTRUNCPATHSTR;
+alias FARSTDTRUNCPATHSTR = extern (Windows) wchar* function(wchar* Str, intptr_t MaxLength);
 
-alias extern (Windows) wchar* function(wchar* Str)FARSTDQUOTESPACEONLY;
+alias FARSTDQUOTESPACEONLY = extern (Windows) wchar* function(wchar* Str);
 
-alias extern (Windows) const(wchar)* function(in wchar* Path) FARSTDPOINTTONAME;
+alias FARSTDPOINTTONAME = extern (Windows) const(wchar)* function(in wchar* Path);
 
-alias extern (Windows) BOOL function(wchar* Path)FARSTDADDENDSLASH;
+alias FARSTDADDENDSLASH = extern (Windows) BOOL function(wchar* Path);
 
-alias extern (Windows) BOOL function(FARCLIPBOARD_TYPE Type, in wchar* Data) FARSTDCOPYTOCLIPBOARD;
+alias FARSTDCOPYTOCLIPBOARD = extern (Windows) BOOL function(FARCLIPBOARD_TYPE Type, in wchar* Data);
 
-alias extern (Windows) size_t function(FARCLIPBOARD_TYPE Type, wchar* Data, size_t Size)FARSTDPASTEFROMCLIPBOARD;
+alias FARSTDPASTEFROMCLIPBOARD = extern (Windows) size_t function(FARCLIPBOARD_TYPE Type, wchar* Data, size_t Size);
 
-alias extern (Windows) int function(wchar Ch)FARSTDLOCALISLOWER;
+alias FARSTDLOCALISLOWER = extern (Windows) int function(wchar Ch);
 
-alias extern (Windows) int function(wchar Ch)FARSTDLOCALISUPPER;
+alias FARSTDLOCALISUPPER = extern (Windows) int function(wchar Ch);
 
-alias extern (Windows) int function(wchar Ch)FARSTDLOCALISALPHA;
+alias FARSTDLOCALISALPHA = extern (Windows) int function(wchar Ch);
 
-alias extern (Windows) int function(wchar Ch)FARSTDLOCALISALPHANUM;
+alias FARSTDLOCALISALPHANUM = extern (Windows) int function(wchar Ch);
 
-alias extern (Windows) wchar function(wchar LowerChar)FARSTDLOCALUPPER;
+alias FARSTDLOCALUPPER = extern (Windows) wchar function(wchar LowerChar);
 
-alias extern (Windows) wchar function(wchar UpperChar)FARSTDLOCALLOWER;
+alias FARSTDLOCALLOWER = extern (Windows) wchar function(wchar UpperChar);
 
-alias extern (Windows) void function(wchar* Buf, intptr_t Length)FARSTDLOCALUPPERBUF;
+alias FARSTDLOCALUPPERBUF = extern (Windows) void function(wchar* Buf, intptr_t Length);
 
-alias extern (Windows) void function(wchar* Buf, intptr_t Length)FARSTDLOCALLOWERBUF;
+alias FARSTDLOCALLOWERBUF = extern (Windows) void function(wchar* Buf, intptr_t Length);
 
-alias extern (Windows) void function(wchar* s1)FARSTDLOCALSTRUPR;
+alias FARSTDLOCALSTRUPR = extern (Windows) void function(wchar* s1);
 
-alias extern (Windows) void function(wchar* s1)FARSTDLOCALSTRLWR;
-
-deprecated
-alias extern (Windows) int function(in wchar* s1, in wchar* s2) FARSTDLOCALSTRICMP;
+alias FARSTDLOCALSTRLWR = extern (Windows) void function(wchar* s1);
 
 deprecated
-alias extern (Windows) int function(in wchar* s1, in wchar* s2, intptr_t n) FARSTDLOCALSTRNICMP;
+alias FARSTDLOCALSTRICMP = extern (Windows) int function(in wchar* s1, in wchar* s2);
 
-alias extern (Windows) ulong function() FARSTDFARCLOCK;
+deprecated
+alias FARSTDLOCALSTRNICMP = extern (Windows) int function(in wchar* s1, in wchar* s2, intptr_t n);
 
-alias extern (Windows) int function(in wchar* Str1, size_t Size1, in wchar* Str2, size_t Size2) FARSTDCOMPARESTRINGS;
+alias FARSTDFARCLOCK = extern (Windows) ulong function();
 
-alias ulong PROCESSNAME_FLAGS;
+alias FARSTDCOMPARESTRINGS = extern (Windows) int function(in wchar* Str1, size_t Size1, in wchar* Str2, size_t Size2);
+
+alias PROCESSNAME_FLAGS = ulong;
 const PROCESSNAME_FLAGS
     //             0xFFFF - length
     //           0xFF0000 - mode
@@ -1929,15 +1929,15 @@ const PROCESSNAME_FLAGS
     PN_SHOWERRORMESSAGE = 0x0000000002000000UL,
     PN_NONE             = 0;
 
-alias extern (Windows) size_t function(
+alias FARSTDPROCESSNAME = extern (Windows) size_t function(
     in wchar* param1,
     wchar* param2,
     size_t size,
-    PROCESSNAME_FLAGS flags) FARSTDPROCESSNAME;
+    PROCESSNAME_FLAGS flags);
 
-alias extern (Windows) void function(wchar* Str)FARSTDUNQUOTE;
+alias FARSTDUNQUOTE = extern (Windows) void function(wchar* Str);
 
-alias ulong XLAT_FLAGS;
+alias XLAT_FLAGS = ulong;
 const XLAT_FLAGS
     XLAT_SWITCHKEYBLAYOUT  = 0x0000000000000001UL,
     XLAT_SWITCHKEYBBEEP    = 0x0000000000000002UL,
@@ -1945,45 +1945,45 @@ const XLAT_FLAGS
     XLAT_CONVERTALLCMDLINE = 0x0000000000010000UL,
     XLAT_NONE              = 0UL;
 
-alias extern (Windows) size_t function(
+alias FARSTDINPUTRECORDTOKEYNAME = extern (Windows) size_t function(
     in INPUT_RECORD* Key,
     wchar* KeyText,
-    size_t Size) FARSTDINPUTRECORDTOKEYNAME;
+    size_t Size);
 
-alias extern (Windows) wchar* function(wchar* Line, intptr_t StartPos, intptr_t EndPos, XLAT_FLAGS Flags)FARSTDXLAT;
+alias FARSTDXLAT = extern (Windows) wchar* function(wchar* Line, intptr_t StartPos, intptr_t EndPos, XLAT_FLAGS Flags);
 
-alias extern (Windows) BOOL function(
+alias FARSTDKEYNAMETOINPUTRECORD = extern (Windows) BOOL function(
     in wchar* Name,
-    INPUT_RECORD* Key) FARSTDKEYNAMETOINPUTRECORD;
+    INPUT_RECORD* Key);
 
-alias extern (Windows) int function(
+alias FRSUSERFUNC = extern (Windows) int function(
     in PluginPanelItem* FData,
     in wchar* FullName,
-    void* Param) FRSUSERFUNC;
+    void* Param);
 
-alias ulong FRSMODE;
+alias FRSMODE = ulong;
 const FRSMODE
     FRS_RETUPDIR             = 0x0000000000000001UL,
     FRS_RECUR                = 0x0000000000000002UL,
     FRS_SCANSYMLINK          = 0x0000000000000004UL,
     FRS_NONE                 = 0;
 
-alias extern (Windows) void function(
+alias FARSTDRECURSIVESEARCH = extern (Windows) void function(
     in wchar* InitDir,
     in wchar* Mask,
     FRSUSERFUNC Func,
     FRSMODE Flags,
-    void* Param) FARSTDRECURSIVESEARCH;
+    void* Param);
 
-alias extern (Windows) size_t function(
+alias FARSTDMKTEMP = extern (Windows) size_t function(
     wchar* Dest,
     size_t DestSize,
-    in wchar* Prefix) FARSTDMKTEMP;
+    in wchar* Prefix);
 
-alias extern (Windows) size_t function(
+alias FARSTDGETPATHROOT = extern (Windows) size_t function(
     in wchar* Path,
     wchar* Root,
-    size_t DestSize) FARSTDGETPATHROOT;
+    size_t DestSize);
 
 enum LINK_TYPE
 {
@@ -1995,23 +1995,23 @@ enum LINK_TYPE
     LINK_SYMLINK          = 6,
 }
 
-alias ulong MKLINK_FLAGS;
+alias MKLINK_FLAGS = ulong;
 const MKLINK_FLAGS
     MLF_SHOWERRMSG       = 0x0000000000010000UL,
     MLF_DONOTUPDATEPANEL = 0x0000000000020000UL,
     MLF_HOLDTARGET       = 0x0000000000040000UL,
     MLF_NONE             = 0UL;
 
-alias extern (Windows) BOOL function(
+alias FARSTDMKLINK = extern (Windows) BOOL function(
     in wchar* Src,
     in wchar* Dest,
     LINK_TYPE Type,
-    MKLINK_FLAGS Flags) FARSTDMKLINK;
+    MKLINK_FLAGS Flags);
 
-alias extern (Windows) size_t function(
+alias FARGETREPARSEPOINTINFO = extern (Windows) size_t function(
     in wchar* Src,
     wchar* Dest,
-    size_t DestSize) FARGETREPARSEPOINTINFO;
+    size_t DestSize);
 
 enum CONVERTPATHMODES
 {
@@ -2020,15 +2020,15 @@ enum CONVERTPATHMODES
     CPM_NATIVE                      = 2,
 }
 
-alias extern (Windows) size_t function(
+alias FARCONVERTPATH = extern (Windows) size_t function(
     CONVERTPATHMODES Mode,
     in wchar* Src,
     wchar* Dest,
-    size_t DestSize) FARCONVERTPATH;
+    size_t DestSize);
 
-alias extern (Windows) size_t function(size_t Size, wchar* Buffer)FARGETCURRENTDIRECTORY;
+alias FARGETCURRENTDIRECTORY = extern (Windows) size_t function(size_t Size, wchar* Buffer);
 
-alias ulong FARFORMATFILESIZEFLAGS;
+alias FARFORMATFILESIZEFLAGS = ulong;
 const FARFORMATFILESIZEFLAGS
     FFFS_COMMAS                 = 0x0100000000000000UL,
     FFFS_FLOATSIZE              = 0x0200000000000000UL,
@@ -2039,7 +2039,7 @@ const FARFORMATFILESIZEFLAGS
     FFFS_MINSIZEINDEX_MASK      = 0x0000000000000003UL,
     FFFS_NONE                   = 0;
 
-alias extern (Windows) size_t function(ulong Size, intptr_t Width, FARFORMATFILESIZEFLAGS Flags, wchar* Dest, size_t DestSize)FARFORMATFILESIZE;
+alias FARFORMATFILESIZE = extern (Windows) size_t function(ulong Size, intptr_t Width, FARFORMATFILESIZEFLAGS Flags, wchar* Dest, size_t DestSize);
 
 struct FarStandardFunctions
 {
@@ -2093,7 +2093,7 @@ struct FarStandardFunctions
     FARSTDFARCLOCK FarClock;
     FARSTDCOMPARESTRINGS CompareStrings;
 }
-alias FarStandardFunctions FARSTANDARDFUNCTIONS;
+alias FARSTANDARDFUNCTIONS = FarStandardFunctions;
 
 struct PluginStartupInfo
 {
@@ -2133,33 +2133,33 @@ struct PluginStartupInfo
     void* Instance;
 }
 
-alias extern (Windows) HANDLE function(
+alias FARAPICREATEFILE = extern (Windows) HANDLE function(
     in wchar* Object,
     DWORD DesiredAccess,
     DWORD ShareMode,
     LPSECURITY_ATTRIBUTES SecurityAttributes,
     DWORD CreationDistribution,
     DWORD FlagsAndAttributes,
-    HANDLE TemplateFile) FARAPICREATEFILE;
+    HANDLE TemplateFile);
 
-alias extern (Windows) DWORD function(in wchar* FileName) FARAPIGETFILEATTRIBUTES;
+alias FARAPIGETFILEATTRIBUTES = extern (Windows) DWORD function(in wchar* FileName);
 
-alias extern (Windows) BOOL function(
+alias FARAPISETFILEATTRIBUTES = extern (Windows) BOOL function(
     in wchar* FileName,
-    DWORD dwFileAttributes) FARAPISETFILEATTRIBUTES;
+    DWORD dwFileAttributes);
 
-alias extern (Windows) BOOL function(
+alias FARAPIMOVEFILEEX = extern (Windows) BOOL function(
     in wchar* ExistingFileName,
     in wchar* NewFileName,
-    DWORD dwFlags) FARAPIMOVEFILEEX;
+    DWORD dwFlags);
 
-alias extern (Windows) BOOL function(in wchar* FileName) FARAPIDELETEFILE;
+alias FARAPIDELETEFILE = extern (Windows) BOOL function(in wchar* FileName);
 
-alias extern (Windows) BOOL function(in wchar* DirName) FARAPIREMOVEDIRECTORY;
+alias FARAPIREMOVEDIRECTORY = extern (Windows) BOOL function(in wchar* DirName);
 
-alias extern (Windows) BOOL function(
+alias FARAPICREATEDIRECTORY = extern (Windows) BOOL function(
     in wchar* PathName,
-    LPSECURITY_ATTRIBUTES lpSecurityAttributes) FARAPICREATEDIRECTORY;
+    LPSECURITY_ATTRIBUTES lpSecurityAttributes);
 
 struct ArclitePrivateInfo
 {
@@ -2192,7 +2192,7 @@ struct MacroPluginReturn
     FarMacroValue* Values;
 }
 
-alias extern (Windows) intptr_t function(intptr_t CheckCode, FarMacroCall* Data) FARAPICALLFAR;
+alias FARAPICALLFAR = extern (Windows) intptr_t function(intptr_t CheckCode, FarMacroCall* Data);
 
 struct MacroPrivateInfo
 {
@@ -2200,7 +2200,7 @@ struct MacroPrivateInfo
     FARAPICALLFAR CallFar;
 }
 
-alias ulong PLUGIN_FLAGS;
+alias PLUGIN_FLAGS = ulong;
 const PLUGIN_FLAGS
     PF_PRELOAD        = 0x0000000000000001UL,
     PF_DISABLEPANELS  = 0x0000000000000002UL,
@@ -2277,7 +2277,7 @@ struct FarGetPluginInformation
     GlobalInfo* GInfo;
 }
 
-alias ulong INFOPANELLINE_FLAGS;
+alias INFOPANELLINE_FLAGS = ulong;
 const INFOPANELLINE_FLAGS
     IPLFLAGS_SEPARATOR      = 0x0000000000000001UL,
     IPLFLAGS_NONE           = 0;
@@ -2289,7 +2289,7 @@ struct InfoPanelLine
     INFOPANELLINE_FLAGS Flags;
 }
 
-alias ulong PANELMODE_FLAGS;
+alias PANELMODE_FLAGS = ulong;
 const PANELMODE_FLAGS
     PMFLAGS_FULLSCREEN      = 0x0000000000000001UL,
     PMFLAGS_DETAILEDSTATUS  = 0x0000000000000002UL,
@@ -2307,7 +2307,7 @@ struct PanelMode
     PANELMODE_FLAGS Flags;
 }
 
-alias ulong OPENPANELINFO_FLAGS;
+alias OPENPANELINFO_FLAGS = ulong;
 const OPENPANELINFO_FLAGS
     OPIF_DISABLEFILTER           = 0x0000000000000001UL,
     OPIF_DISABLESORTGROUPS       = 0x0000000000000002UL,
@@ -2348,7 +2348,7 @@ struct FarSetKeyBarTitles
     KeyBarTitles* Titles;
 }
 
-alias ulong OPERATION_MODES;
+alias OPERATION_MODES = ulong;
 const OPERATION_MODES
     OPM_SILENT     =0x0000000000000001UL,
     OPM_FIND       =0x0000000000000002UL,
@@ -2410,7 +2410,7 @@ struct OpenMacroInfo
     FarMacroValue* Values;
 }
 
-alias ulong FAROPENSHORTCUTFLAGS;
+alias FAROPENSHORTCUTFLAGS = ulong;
 const FAROPENSHORTCUTFLAGS
     FOSF_ACTIVE = 0x0000000000000001UL,
     FOSF_NONE   = 0;
@@ -2626,7 +2626,7 @@ struct ProcessEditorInputInfo
 	void* Instance;
 }
 
-alias ulong PROCESSCONSOLEINPUT_FLAGS;
+alias PROCESSCONSOLEINPUT_FLAGS = ulong;
 const PROCESSCONSOLEINPUT_FLAGS
     PCIF_NONE     = 0;
 

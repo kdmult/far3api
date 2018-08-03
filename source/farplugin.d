@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5225
+  Plugin API for Far Manager 3.0 build 5252
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5225;
+const FARMANAGERVERSION_BUILD = 5252;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -77,6 +77,15 @@ struct FarColor
 const INDEXMASK = 0x0000000F;
 const COLORMASK = 0x00FFFFFF;
 const ALPHAMASK = 0xFF000000;
+
+auto INDEXVALUE(ARG1)(ARG1 x) { return ((x)&INDEXMASK); }
+auto COLORVALUE(ARG1)(ARG1 x) { return ((x)&COLORMASK); }
+auto ALPHAVALUE(ARG1)(ARG1 x) { return ((x)&ALPHAMASK); }
+
+auto IS_OPAQUE(ARG1)(ARG1 x) { return (ALPHAVALUE(x)==ALPHAMASK); }
+auto IS_TRANSPARENT(ARG1)(ARG1 x) { return (!ALPHAVALUE(x)); }
+void MAKE_OPAQUE(ARG1)(ref ARG1 x) { (x|=ALPHAMASK); }
+void MAKE_TRANSPARENT(ARG1)(ref ARG1 x) { (x&=COLORMASK); }
 
 alias COLORDIALOGFLAGS = ulong;
 const COLORDIALOGFLAGS CDF_NONE = 0UL;
@@ -336,7 +345,8 @@ struct FarListItem
 {
     LISTITEMFLAGS Flags;
     const(wchar)* Text;
-    intptr_t[2] Reserved;
+    intptr_t UserData;
+    intptr_t Reserved;
 }
 
 struct FarListUpdate

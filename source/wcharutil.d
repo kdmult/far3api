@@ -43,7 +43,7 @@ unittest
         immutable(C)[] s2 = "abc";
         assert(toWString(s2) == "abc"w);
         assert(toWString(s2.ptr) == "abc"w);
-        
+
         immutable(C)[] s3 = "абвгд";
         assert(toWString(s3) == "абвгд"w);
         assert(toWString(s3.ptr) == "абвгд"w);
@@ -90,7 +90,7 @@ unittest
         immutable(C)[] s2 = "abc";
         assert(toWStringz(s2)[0..4] == "abc\0"w);
         assert(toWStringz(s2.ptr)[0..4] == "abc\0"w);
-        
+
         immutable(C)[] s3 = "абвгд";
         assert(toWStringz(s3)[0..6] == "абвгд\0"w);
         assert(toWStringz(s3.ptr)[0..6] == "абвгд\0"w);

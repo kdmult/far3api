@@ -1,5 +1,5 @@
 /*
-  Dynamic construction of dialogs for FAR Manager 3.0 build 5252
+  Dynamic construction of dialogs for FAR Manager 3.0 build 5445
 
   Original code: http://farmanager.googlecode.com/svn/trunk/plugins/common/unicode/DlgBuilder.hpp
   License: derived from original one without extra restriction
@@ -639,8 +639,8 @@ public:
         if (Separator)
             AddSeparator();
 
-        int[3] MsgIDs = [OKMessageId, CancelMessageId, ExtraMessageId];
-        int NumButtons = (ExtraMessageId != -1) ? 3 : (CancelMessageId != -1 ? 2 : 1);
+        const int[3] MsgIDs = [OKMessageId, CancelMessageId, ExtraMessageId];
+        const int NumButtons = (ExtraMessageId != -1) ? 3 : (CancelMessageId != -1 ? 2 : 1);
 
         AddButtons(NumButtons, MsgIDs, 0, 1);
     }

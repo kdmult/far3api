@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5252
+  Plugin API for Far Manager 3.0 build 5445
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5252;
+const FARMANAGERVERSION_BUILD = 5445;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -51,27 +51,27 @@ struct FarColor
     }
     void* Reserved;
 
-	bool IsBg4Bit() const
-	{
-		return (Flags & FCF_BG_4BIT) != 0;
-	}
+    bool IsBg4Bit() const
+    {
+        return (Flags & FCF_BG_4BIT) != 0;
+    }
 
-	bool IsFg4Bit() const
-	{
-		return (Flags & FCF_FG_4BIT) != 0;
-	}
+    bool IsFg4Bit() const
+    {
+        return (Flags & FCF_FG_4BIT) != 0;
+    }
 
-	FarColor SetBg4Bit(bool Value)
-	{
-		Value? Flags |= FCF_BG_4BIT : Flags &= ~FCF_BG_4BIT;
-		return this;
-	}
+    FarColor SetBg4Bit(bool Value)
+    {
+        Value? Flags |= FCF_BG_4BIT : (Flags &= ~FCF_BG_4BIT);
+        return this;
+    }
 
-	FarColor SetFg4Bit(bool Value)
-	{
-		Value? Flags |= FCF_FG_4BIT : Flags &= ~FCF_FG_4BIT;
-		return this;
-	}
+    FarColor SetFg4Bit(bool Value)
+    {
+        Value? Flags |= FCF_FG_4BIT : (Flags &= ~FCF_FG_4BIT);
+        return this;
+    }
 }
 
 const INDEXMASK = 0x0000000F;
@@ -560,12 +560,12 @@ struct FarKey
 
 alias MENUITEMFLAGS = ulong;
 const MENUITEMFLAGS
-    MIF_SELECTED   = 0x000000000010000UL,
-    MIF_CHECKED    = 0x000000000020000UL,
-    MIF_SEPARATOR  = 0x000000000040000UL,
-    MIF_DISABLE    = 0x000000000080000UL,
-    MIF_GRAYED     = 0x000000000100000UL,
-    MIF_HIDDEN     = 0x000000000200000UL,
+    MIF_SELECTED   = 0x0000000000010000UL,
+    MIF_CHECKED    = 0x0000000000020000UL,
+    MIF_SEPARATOR  = 0x0000000000040000UL,
+    MIF_DISABLE    = 0x0000000000080000UL,
+    MIF_GRAYED     = 0x0000000000100000UL,
+    MIF_HIDDEN     = 0x0000000000200000UL,
     MIF_NONE       = 0UL;
 
 struct FarMenuItem
@@ -654,27 +654,27 @@ struct FarGetPluginPanelItem
 
 struct SortingPanelItem
 {
-	FILETIME CreationTime;
-	FILETIME LastAccessTime;
-	FILETIME LastWriteTime;
-	FILETIME ChangeTime;
-	ulong FileSize;
-	ulong AllocationSize;
-	const(wchar)* FileName;
-	const(wchar)* AlternateFileName;
-	const(wchar)* Description;
-	const(wchar)* Owner;
-	const(wchar*)* CustomColumnData;
-	size_t CustomColumnNumber;
-	PLUGINPANELITEMFLAGS Flags;
-	UserDataItem UserData;
-	uintptr_t FileAttributes;
-	uintptr_t NumberOfLinks;
-	uintptr_t CRC32;
-	intptr_t Position;
-	intptr_t SortGroup;
-	uintptr_t NumberOfStreams;
-	ulong StreamsSize;
+    FILETIME CreationTime;
+    FILETIME LastAccessTime;
+    FILETIME LastWriteTime;
+    FILETIME ChangeTime;
+    ulong FileSize;
+    ulong AllocationSize;
+    const(wchar)* FileName;
+    const(wchar)* AlternateFileName;
+    const(wchar)* Description;
+    const(wchar)* Owner;
+    const(wchar*)* CustomColumnData;
+    size_t CustomColumnNumber;
+    PLUGINPANELITEMFLAGS Flags;
+    UserDataItem UserData;
+    uintptr_t FileAttributes;
+    uintptr_t NumberOfLinks;
+    uintptr_t CRC32;
+    intptr_t Position;
+    intptr_t SortGroup;
+    uintptr_t NumberOfStreams;
+    ulong StreamsSize;
 }
 
 alias PANELINFOFLAGS = ulong;
@@ -1120,9 +1120,9 @@ struct MacroExecuteString
 
 struct FarMacroLoad
 {
-	size_t StructSize;
-	const(wchar)* Path;
-	ulong Flags;
+    size_t StructSize;
+    const(wchar)* Path;
+    ulong Flags;
 }
 
 alias FARSETCOLORFLAGS = ulong;
@@ -2130,7 +2130,7 @@ struct PluginStartupInfo
     FARAPIREGEXPCONTROL RegExpControl;
     FARAPIMACROCONTROL MacroControl;
     FARAPISETTINGSCONTROL SettingsControl;
-    void* Private;
+    const(void)* Private;
     void* Instance;
 }
 
@@ -2224,6 +2224,8 @@ enum VERSION_STAGE
     VS_ALPHA                        = 1,
     VS_BETA                         = 2,
     VS_RC                           = 3,
+    VS_SPECIAL                      = 4,
+    VS_PRIVATE                      = 5,
 }
 
 struct VersionInfo
@@ -2237,7 +2239,10 @@ struct VersionInfo
 
 BOOL CheckVersion(in VersionInfo* Current, in VersionInfo* Required)
 {
-    return (Current.Major > Required.Major) || (Current.Major == Required.Major && Current.Minor > Required.Minor) || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision > Required.Revision) || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision == Required.Revision && Current.Build >= Required.Build);
+    return (Current.Major > Required.Major)
+        || (Current.Major == Required.Major && Current.Minor > Required.Minor)
+        || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision > Required.Revision)
+        || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision == Required.Revision && Current.Build >= Required.Build);
 }
 
 VersionInfo MakeFarVersion(DWORD Major, DWORD Minor, DWORD Revision, DWORD Build, VERSION_STAGE Stage)
@@ -2394,7 +2399,7 @@ struct AnalyseInfo
     void* Buffer;
     size_t BufferSize;
     OPERATION_MODES OpMode;
-	void* Instance;
+    void* Instance;
 }
 
 struct OpenAnalyseInfo
@@ -2484,7 +2489,7 @@ struct OpenMacroPluginInfo
 {
     MACROCALLTYPE CallType;
     FarMacroCall* Data;
-	MacroPluginReturn Ret;
+    MacroPluginReturn Ret;
 }
 
 enum FAR_EVENTS
@@ -2507,7 +2512,7 @@ struct OpenInfo
     OPENFROM OpenFrom;
     const(GUID)* Guid;
     intptr_t Data;
-	void* Instance;
+    void* Instance;
 }
 
 struct SetDirectoryInfo
@@ -2518,7 +2523,7 @@ struct SetDirectoryInfo
     intptr_t Reserved;
     OPERATION_MODES OpMode;
     UserDataItem UserData;
-	void* Instance;
+    void* Instance;
 }
 
 struct SetFindListInfo
@@ -2527,7 +2532,7 @@ struct SetFindListInfo
     HANDLE hPanel;
     const(PluginPanelItem)* PanelItem;
     size_t ItemsNumber;
-	void* Instance;
+    void* Instance;
 }
 
 struct PutFilesInfo
@@ -2539,7 +2544,7 @@ struct PutFilesInfo
     BOOL Move;
     const(wchar)* SrcPath;
     OPERATION_MODES OpMode;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessHostFileInfo
@@ -2549,7 +2554,7 @@ struct ProcessHostFileInfo
     PluginPanelItem* PanelItem;
     size_t ItemsNumber;
     OPERATION_MODES OpMode;
-	void* Instance;
+    void* Instance;
 }
 
 struct MakeDirectoryInfo
@@ -2558,7 +2563,7 @@ struct MakeDirectoryInfo
     HANDLE hPanel;
     const(wchar)* Name;
     OPERATION_MODES OpMode;
-	void* Instance;
+    void* Instance;
 }
 
 struct CompareInfo
@@ -2568,7 +2573,7 @@ struct CompareInfo
     const(PluginPanelItem)* Item1;
     const(PluginPanelItem)* Item2;
     OPENPANELINFO_SORTMODES Mode;
-	void* Instance;
+    void* Instance;
 }
 
 struct GetFindDataInfo
@@ -2578,7 +2583,7 @@ struct GetFindDataInfo
     PluginPanelItem* PanelItem;
     size_t ItemsNumber;
     OPERATION_MODES OpMode;
-	void* Instance;
+    void* Instance;
 }
 
 struct FreeFindDataInfo
@@ -2587,7 +2592,7 @@ struct FreeFindDataInfo
     HANDLE hPanel;
     PluginPanelItem* PanelItem;
     size_t ItemsNumber;
-	void* Instance;
+    void* Instance;
 }
 
 struct GetFilesInfo
@@ -2599,7 +2604,7 @@ struct GetFilesInfo
     BOOL Move;
     const(wchar)* DestPath;
     OPERATION_MODES OpMode;
-	void* Instance;
+    void* Instance;
 }
 
 struct DeleteFilesInfo
@@ -2609,7 +2614,7 @@ struct DeleteFilesInfo
     PluginPanelItem* PanelItem;
     size_t ItemsNumber;
     OPERATION_MODES OpMode;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessPanelInputInfo
@@ -2617,14 +2622,14 @@ struct ProcessPanelInputInfo
     size_t StructSize;
     HANDLE hPanel;
     INPUT_RECORD Rec;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessEditorInputInfo
 {
     size_t StructSize;
     INPUT_RECORD Rec;
-	void* Instance;
+    void* Instance;
 }
 
 alias PROCESSCONSOLEINPUT_FLAGS = ulong;
@@ -2636,13 +2641,13 @@ struct ProcessConsoleInputInfo
     size_t StructSize;
     PROCESSCONSOLEINPUT_FLAGS Flags;
     INPUT_RECORD Rec;
-	void* Instance;
+    void* Instance;
 }
 
 struct ExitInfo
 {
     size_t StructSize;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessPanelEventInfo
@@ -2651,7 +2656,7 @@ struct ProcessPanelEventInfo
     intptr_t Event;
     void* Param;
     HANDLE hPanel;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessEditorEventInfo
@@ -2660,7 +2665,7 @@ struct ProcessEditorEventInfo
     intptr_t Event;
     void* Param;
     intptr_t EditorID;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessDialogEventInfo
@@ -2668,7 +2673,7 @@ struct ProcessDialogEventInfo
     size_t StructSize;
     intptr_t Event;
     FarDialogEvent* Param;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessSynchroEventInfo
@@ -2676,7 +2681,7 @@ struct ProcessSynchroEventInfo
     size_t StructSize;
     intptr_t Event;
     void* Param;
-	void* Instance;
+    void* Instance;
 }
 
 struct ProcessViewerEventInfo
@@ -2685,28 +2690,28 @@ struct ProcessViewerEventInfo
     intptr_t Event;
     void* Param;
     intptr_t ViewerID;
-	void* Instance;
+    void* Instance;
 }
 
 struct ClosePanelInfo
 {
     size_t StructSize;
     HANDLE hPanel;
-	void* Instance;
+    void* Instance;
 }
 
 struct CloseAnalyseInfo
 {
     size_t StructSize;
     HANDLE Handle;
-	void* Instance;
+    void* Instance;
 }
 
 struct ConfigureInfo
 {
     size_t StructSize;
     const(GUID)* Guid;
-	void* Instance;
+    void* Instance;
 }
 
 struct GetContentFieldsInfo
@@ -2729,9 +2734,9 @@ struct GetContentDataInfo
 
 struct ErrorInfo
 {
-	size_t StructSize;
-	const(wchar)* Summary;
-	const(wchar)* Description;
+    size_t StructSize;
+    const(wchar)* Summary;
+    const(wchar)* Description;
 }
 
 GUID FarGuid = {0x00000000, 0x0000, 0x0000, [0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00]};

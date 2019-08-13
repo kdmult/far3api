@@ -1,5 +1,5 @@
 /*
-  Colors Index for FAR Manager 3.0 build 5252
+  Colors Index for FAR Manager 3.0 build 5445
   License: Public Domain
 */
 

@@ -1,5 +1,5 @@
 /*
-  Dynamic construction of dialogs for FAR Manager 3.0 build 5445
+  Dynamic construction of dialogs for FAR Manager 3.0 build 5511
 
   Original code: http://farmanager.googlecode.com/svn/trunk/plugins/common/unicode/DlgBuilder.hpp
   License: derived from original one without extra restriction
@@ -233,7 +233,8 @@ protected:
                 m_DialogItems[i].X2 = Title.X2;
             }
             else if (m_DialogItems[i].Type == FARDIALOGITEMTYPES.DI_TEXT && (m_DialogItems[i].Flags & DIF_CENTERTEXT))
-            { //BUGBUG: two columns items are not supported
+            {
+                //BUGBUG: two columns items are not supported
                 m_DialogItems[i].X2 = m_DialogItems[i].X1 + MaxWidth - 1;
             }
 

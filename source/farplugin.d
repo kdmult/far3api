@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5445
+  Plugin API for Far Manager 3.0 build 5511
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5445;
+const FARMANAGERVERSION_BUILD = 5511;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -584,6 +584,10 @@ const FARMENUFLAGS
     FMENU_AUTOHIGHLIGHT        = 0x0000000000000004UL,
     FMENU_REVERSEAUTOHIGHLIGHT = 0x0000000000000008UL,
     FMENU_CHANGECONSOLETITLE   = 0x0000000000000010UL,
+    FMENU_SHOWNOBOX            = 0x0000000000000020UL,
+    FMENU_SHOWSHORTBOX         = 0x0000000000000040UL,
+    FMENU_SHOWSINGLEBOX        = 0x0000000000000080UL,
+    FMENU_NODRAWSHADOW         = 0x0000000000000100UL,
     FMENU_NONE                 = 0UL;
 
 alias FARAPIMENU = extern (Windows) intptr_t function(
@@ -1051,6 +1055,7 @@ enum FARMACROVARTYPE
     FMVT_NIL                    = 7,
     FMVT_ARRAY                  = 8,
     FMVT_PANEL                  = 9,
+    FMVT_ERROR                  = 10,
 }
 
 struct FarMacroValueBinary

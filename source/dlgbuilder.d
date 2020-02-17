@@ -1,5 +1,5 @@
 /*
-  Dynamic construction of dialogs for FAR Manager 3.0 build 5511
+  Dynamic construction of dialogs for FAR Manager 3.0 build 5555
 
   Original code: http://farmanager.googlecode.com/svn/trunk/plugins/common/unicode/DlgBuilder.hpp
   License: derived from original one without extra restriction
@@ -1115,6 +1115,15 @@ public:
         }
 
         SetLastItemBinding(new PluginEditFieldBinding(Info, &DialogHandle, m_DialogItemsCount - 1, Value, MaxSize));
+        return Item;
+    }
+
+    FarDialogItem* AddReadonlyEditField(const(wchar)* Value, int Width)
+    {
+        FarDialogItem* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_EDIT, Value);
+        SetNextY(Item);
+        Item.X2 = Item.X1 + (Width > 0 ? Width : TextWidth(*Item)) - 1;
+        Item.Flags |= DIF_READONLY;
         return Item;
     }
 

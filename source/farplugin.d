@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5511
+  Plugin API for Far Manager 3.0 build 5555
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5511;
+const FARMANAGERVERSION_BUILD = 5555;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -820,6 +820,8 @@ alias FARAPITEXT = extern (Windows) void function(
 alias FARAPISAVESCREEN = extern (Windows) HANDLE function(intptr_t X1, intptr_t Y1, intptr_t X2, intptr_t Y2);
 
 alias FARAPIRESTORESCREEN = extern (Windows) void function(HANDLE hScreen);
+
+alias FARAPIFREESCREEN = extern (Windows) void function(HANDLE hScreen);
 
 alias FARAPIGETDIRLIST = extern (Windows) intptr_t function(
     in wchar* Dir,
@@ -2137,6 +2139,7 @@ struct PluginStartupInfo
     FARAPISETTINGSCONTROL SettingsControl;
     const(void)* Private;
     void* Instance;
+    FARAPIFREESCREEN FreeScreen;
 }
 
 alias FARAPICREATEFILE = extern (Windows) HANDLE function(

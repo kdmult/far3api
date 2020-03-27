@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5555
+  Plugin API for Far Manager 3.0 build 5577
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5555;
+const FARMANAGERVERSION_BUILD = 5577;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -453,11 +453,6 @@ struct FAR_CHAR_INFO
 {
     wchar Char;
     FarColor Attributes;
-
-    static FAR_CHAR_INFO make(wchar Char, in FarColor Attributes)
-    {
-        return FAR_CHAR_INFO(Char, cast(FarColor) Attributes);
-    }
 }
 
 struct FarDialogItem
@@ -1148,6 +1143,7 @@ struct FarSetColors
 
 enum WINDOWINFO_TYPE
 {
+    WTYPE_UNKNOWN                   = -1,
     WTYPE_DESKTOP                   = 0,
     WTYPE_PANELS                    = 1,
     WTYPE_VIEWER                    = 2,

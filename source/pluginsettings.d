@@ -1,6 +1,6 @@
 /*
-  Original code: http://farmanager.googlecode.com/svn/trunk/plugins/common/unicode/PluginSettings.hpp
-  License: derived from original one without extra restriction
+  Original code: https://github.com/FarGroup/FarManager/blob/master/plugins/common/unicode/PluginSettings.hpp
+  License: derived from original one without extra restrictions
 */
 
 module pluginsettings;

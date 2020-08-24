@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5577
+  Plugin API for Far Manager 3.0 build 5656
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5577;
+const FARMANAGERVERSION_BUILD = 5656;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -49,7 +49,7 @@ struct FarColor
         COLORREF BackgroundColor;
         rgba BackgroundRGBA;
     }
-    void* Reserved;
+    DWORD[2] Reserved;
 
     bool IsBg4Bit() const
     {
@@ -602,6 +602,7 @@ alias FARAPIMENU = extern (Windows) intptr_t function(
 
 alias PLUGINPANELITEMFLAGS = ulong;
 const PLUGINPANELITEMFLAGS
+    // The low word is reserved for private flags
     PPIF_SELECTED               = 0x0000000040000000UL,
     PPIF_PROCESSDESCR           = 0x0000000080000000UL,
     PPIF_NONE                   = 0UL;
@@ -707,6 +708,7 @@ enum OPENPANELINFO_SORTMODES
     SM_DEFAULT                   =  0,
     SM_UNSORTED                  =  1,
     SM_NAME                      =  2,
+    SM_FULLNAME                  =  SM_NAME,
     SM_EXT                       =  3,
     SM_MTIME                     =  4,
     SM_CTIME                     =  5,
@@ -718,10 +720,11 @@ enum OPENPANELINFO_SORTMODES
     SM_NUMLINKS                  = 11,
     SM_NUMSTREAMS                = 12,
     SM_STREAMSSIZE               = 13,
-    SM_FULLNAME                  = 14,
+    SM_NAMEONLY                  = 14,
     SM_CHTIME                    = 15,
 
-    SM_COUNT
+    SM_COUNT,
+    SM_USER                      = 100000
 }
 
 struct PanelInfo

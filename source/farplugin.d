@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0 build 5656
+  Plugin API for Far Manager 3.0.5700.0
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5656;
+const FARMANAGERVERSION_BUILD = 5700;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -91,7 +91,7 @@ alias COLORDIALOGFLAGS = ulong;
 const COLORDIALOGFLAGS CDF_NONE = 0UL;
 
 alias FARAPICOLORDIALOG = extern (Windows) BOOL function(
-    in GUID* PluginId,
+    in UUID* PluginId,
     COLORDIALOGFLAGS Flags,
     FarColor* Color);
 
@@ -111,8 +111,8 @@ const FARMESSAGEFLAGS
     FMSG_NONE                = 0UL;
 
 alias FARAPIMESSAGE = extern (Windows) intptr_t function(
-    in GUID* PluginId,
-    in GUID* Id,
+    in UUID* PluginId,
+    in UUID* Id,
     FARMESSAGEFLAGS Flags,
     in wchar* HelpTopic,
     in wchar** Items,
@@ -501,8 +501,8 @@ struct OpenDlgPluginData
 struct DialogInfo
 {
     size_t StructSize;
-    GUID Id;
-    GUID Owner;
+    UUID Id;
+    UUID Owner;
 }
 
 struct FarGetDialogItem
@@ -529,8 +529,8 @@ alias FARAPISENDDLGMESSAGE = extern (Windows) intptr_t function(HANDLE hDlg, int
 alias FARAPIDEFDLGPROC = extern (Windows) intptr_t function(HANDLE hDlg, intptr_t Msg, intptr_t Param1, void* Param2);
 
 alias FARAPIDIALOGINIT = extern (Windows) HANDLE function(
-    in GUID* PluginId,
-    in GUID* Id,
+    in UUID* PluginId,
+    in UUID* Id,
     intptr_t X1,
     intptr_t Y1,
     intptr_t X2,
@@ -586,8 +586,8 @@ const FARMENUFLAGS
     FMENU_NONE                 = 0UL;
 
 alias FARAPIMENU = extern (Windows) intptr_t function(
-    in GUID* PluginId,
-    in GUID* Id,
+    in UUID* PluginId,
+    in UUID* Id,
     intptr_t X,
     intptr_t Y,
     intptr_t MaxHeight,
@@ -731,7 +731,7 @@ struct PanelInfo
 {
     size_t StructSize;
     HANDLE PluginHandle;
-    GUID OwnerGuid;
+    UUID OwnerGuid;
     PANELINFOFLAGS Flags;
     size_t ItemsNumber;
     size_t SelectedItemsNumber;
@@ -762,7 +762,7 @@ struct FarPanelDirectory
     size_t StructSize;
     const(wchar)* Name;
     const(wchar)* Param;
-    GUID PluginId;
+    UUID PluginId;
     const(wchar)* File;
 }
 
@@ -827,7 +827,7 @@ alias FARAPIGETDIRLIST = extern (Windows) intptr_t function(
     size_t* pItemsNumber);
 
 alias FARAPIGETPLUGINDIRLIST = extern (Windows) intptr_t function(
-    in GUID* PluginId,
+    in UUID* PluginId,
     HANDLE hPanel,
     in wchar* Dir,
     PluginPanelItem** pPanelItem,
@@ -897,7 +897,7 @@ alias FARAPIEDITOR = extern (Windows) intptr_t function(
     uintptr_t CodePage);
 
 alias FARAPIGETMSG = extern (Windows) const(wchar)* function(
-    in GUID* PluginId,
+    in UUID* PluginId,
     intptr_t MsgId);
 
 alias FARHELPFLAGS = ulong;
@@ -1092,7 +1092,7 @@ struct FarMacroValue
     this(double v)           { Type=FARMACROVARTYPE.FMVT_DOUBLE; Double=v; }
     this(const(wchar)* v)  { Type=FARMACROVARTYPE.FMVT_STRING; String=v; }
     this(void* v)            { Type=FARMACROVARTYPE.FMVT_POINTER; Pointer=v; }
-    this(ref const GUID v)   { Type=FARMACROVARTYPE.FMVT_BINARY; Binary.Data=cast(void*)&v; Binary.Size=GUID.sizeof; }
+    this(ref const UUID v)   { Type=FARMACROVARTYPE.FMVT_BINARY; Binary.Data=cast(void*)&v; Binary.Size=UUID.sizeof; }
     this(FarMacroValue* arr,size_t count) { Type=FARMACROVARTYPE.FMVT_ARRAY; Array.Values=arr; Array.Count=count; }
 }
 
@@ -1565,13 +1565,13 @@ struct EditorColor
     uintptr_t Priority;
     EDITORCOLORFLAGS Flags;
     FarColor Color;
-    GUID Owner;
+    UUID Owner;
 }
 
 struct EditorDeleteColor
 {
     size_t StructSize;
-    GUID Owner;
+    UUID Owner;
     intptr_t StringNumber;
     intptr_t StartPos;
 }
@@ -1603,7 +1603,7 @@ struct EditorChange
 struct EditorSubscribeChangeEvent
 {
     size_t StructSize;
-    GUID PluginId;
+    UUID PluginId;
 }
 
 alias INPUTBOXFLAGS = ulong;
@@ -1619,8 +1619,8 @@ const INPUTBOXFLAGS
     FIB_NONE             = 0UL;
 
 alias FARAPIINPUTBOX = extern (Windows) intptr_t function(
-    in GUID* PluginId,
-    in GUID* Id,
+    in UUID* PluginId,
+    in UUID* Id,
     in wchar* Title,
     in wchar* SubTitle,
     in wchar* HistoryName,
@@ -1759,7 +1759,7 @@ enum FAR_PLUGIN_SETTINGS_LOCATION
 struct FarSettingsCreate
 {
     size_t StructSize;
-    GUID Guid;
+    UUID Guid;
     HANDLE Handle;
 }
 
@@ -1793,7 +1793,7 @@ struct FarSettingsHistory
 {
     const(wchar)* Name;
     const(wchar)* Param;
-    GUID PluginId;
+    UUID PluginId;
     const(wchar)* File;
     FILETIME Time;
     BOOL Lock;
@@ -1821,7 +1821,7 @@ struct FarSettingsValue
 alias FARAPIPANELCONTROL = extern (Windows) intptr_t function(HANDLE hPanel, FILE_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
 alias FARAPIADVCONTROL = extern (Windows) intptr_t function(
-    in GUID* PluginId,
+    in UUID* PluginId,
     ADVANCED_CONTROL_COMMANDS Command,
     intptr_t Param1,
     void* Param2);
@@ -1831,7 +1831,7 @@ alias FARAPIVIEWERCONTROL = extern (Windows) intptr_t function(intptr_t ViewerID
 alias FARAPIEDITORCONTROL = extern (Windows) intptr_t function(intptr_t EditorID, EDITOR_CONTROL_COMMANDS Command, intptr_t Param1, void* Param2);
 
 alias FARAPIMACROCONTROL = extern (Windows) intptr_t function(
-    in GUID* PluginId,
+    in UUID* PluginId,
     FAR_MACRO_CONTROL_COMMANDS Command,
     intptr_t Param1,
     void* Param2);
@@ -2220,7 +2220,7 @@ const PLUGIN_FLAGS
 
 struct PluginMenuItem
 {
-    const(GUID)* Guids;
+    const(UUID)* Guids;
     const(wchar*)* Strings;
     size_t Count;
 }
@@ -2263,7 +2263,7 @@ struct GlobalInfo
     size_t StructSize;
     VersionInfo MinFarVersion;
     VersionInfo Version;
-    GUID Guid;
+    UUID Guid;
     const(wchar)* Title;
     const(wchar)* Description;
     const(wchar)* Author;
@@ -2517,7 +2517,7 @@ struct OpenInfo
 {
     size_t StructSize;
     OPENFROM OpenFrom;
-    const(GUID)* Guid;
+    const(UUID)* Guid;
     intptr_t Data;
     void* Instance;
 }
@@ -2717,7 +2717,7 @@ struct CloseAnalyseInfo
 struct ConfigureInfo
 {
     size_t StructSize;
-    const(GUID)* Guid;
+    const(UUID)* Guid;
     void* Instance;
 }
 
@@ -2746,7 +2746,7 @@ struct ErrorInfo
     const(wchar)* Description;
 }
 
-GUID FarGuid = {0x00000000, 0x0000, 0x0000, [0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00]};
+UUID FarGuid = {0x00000000, 0x0000, 0x0000, [0x00,0x00, 0x00,0x00,0x00,0x00,0x00,0x00]};
 
 // Exported Functions
 

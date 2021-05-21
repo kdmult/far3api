@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0.5700.0
+  Plugin API for Far Manager 3.0.5800.0
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5700;
+const FARMANAGERVERSION_BUILD = 5800;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -21,18 +21,25 @@ const CP_REDETECT   = cast(uintptr_t)-2;
 
 alias FARCOLORFLAGS = ulong;
 const FARCOLORFLAGS
-    FCF_FG_4BIT = 0x0000000000000001UL,
-    FCF_BG_4BIT = 0x0000000000000002UL,
-    FCF_4BITMASK = FCF_FG_4BIT|FCF_BG_4BIT, // 0x0000000000000003UL
+    FCF_FG_4BIT       = 0x0000000000000001UL,
+    FCF_BG_4BIT       = 0x0000000000000002UL,
+    FCF_4BITMASK      = 0x0000000000000003UL, // FCF_FG_4BIT|FCF_BG_4BIT
 
-    FCF_RAWATTR_MASK = 0x000000000000FF00UL, // stored console attributes
+    FCF_IGNORE_STYLE  = 0x0000000000000004UL,
 
-    FCF_EXTENDEDFLAGS = ~FCF_4BITMASK, // 0xFFFFFFFFFFFFFFFCUL
-    FCF_FG_BOLD = 0x1000000000000000UL,
-    FCF_FG_ITALIC = 0x2000000000000000UL,
-    FCF_FG_UNDERLINE = 0x4000000000000000UL,
-    FCF_STYLEMASK = FCF_FG_BOLD|FCF_FG_ITALIC|FCF_FG_UNDERLINE, // 0x7000000000000000UL
-    FCF_NONE = 0UL;
+    FCF_RAWATTR_MASK  = 0x000000000000FF00UL, // stored console attributes
+
+    FCF_FG_BOLD       = 0x1000000000000000UL,
+    FCF_FG_ITALIC     = 0x2000000000000000UL,
+    FCF_FG_UNDERLINE  = 0x4000000000000000UL,
+    FCF_FG_UNDERLINE2 = 0x8000000000000000UL,
+    FCF_FG_OVERLINE   = 0x0100000000000000UL,
+    FCF_FG_STRIKEOUT  = 0x0200000000000000UL,
+    FCF_FG_FAINT      = 0x0400000000000000UL,
+    FCF_FG_BLINK      = 0x0800000000000000UL,
+
+    FCF_STYLEMASK     = 0xFF00000000000000UL,
+    FCF_NONE          = 0UL;
 
 struct rgba { byte r, g, b, a; }
 
@@ -2248,8 +2255,8 @@ BOOL CheckVersion(in VersionInfo* Current, in VersionInfo* Required)
 {
     return (Current.Major > Required.Major)
         || (Current.Major == Required.Major && Current.Minor > Required.Minor)
-        || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision > Required.Revision)
-        || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Revision == Required.Revision && Current.Build >= Required.Build);
+        || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Build > Required.Build)
+        || (Current.Major == Required.Major && Current.Minor == Required.Minor && Current.Build == Required.Build && Current.Revision >= Required.Revision);
 }
 
 VersionInfo MakeFarVersion(DWORD Major, DWORD Minor, DWORD Revision, DWORD Build, VERSION_STAGE Stage)

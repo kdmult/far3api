@@ -365,6 +365,11 @@ protected:
         return null;
     }
 
+    DialogItemBinding!T CreateCheckBoxBinding(bool* Value)
+    {
+        return null;
+    }
+
     DialogItemBinding!T CreateRadioButtonBinding(int* Value)
     {
         return null;
@@ -432,9 +437,26 @@ public:
     }
 
     // Добавляет чекбокс.
+    T* AddCheckbox(in wchar* TextMessage, bool* Value)
+    {
+        T* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_CHECKBOX, TextMessage);
+        SetNextY(Item);
+        Item.X2 = Item.X1 + ItemWidth(*Item);
+        Item.Selected = *Value;
+        SetLastItemBinding(CreateCheckBoxBinding(Value));
+        return Item;
+    }
+
+    // Добавляет чекбокс.
     T* AddCheckbox(int TextMessageId, int* Value, int Mask = 0, bool ThreeState = false)
     {
         return AddCheckbox(GetLangString(TextMessageId), Value, Mask, ThreeState);
+    }
+
+    // Добавляет чекбокс.
+    T* AddCheckbox(int TextMessageId, bool* Value)
+    {
+        return AddCheckbox(GetLangString(TextMessageId), Value);
     }
 
     // Добавляет группу радиокнопок.
@@ -729,15 +751,22 @@ protected:
 
 class PluginCheckBoxBinding : DialogAPIBinding
 {
-    int* Value;
+    int* IntValue;
+    bool* BoolValue;
     int Mask;
 
 public:
     this(in PluginStartupInfo* aInfo, HANDLE* aHandle, int aID, int* aValue, int aMask)
     {
         super(aInfo, aHandle, aID);
-        Value = aValue;
+        IntValue = aValue;
         Mask = aMask;
+    }
+
+    this(in PluginStartupInfo* aInfo, HANDLE* aHandle, int aID, bool* aValue)
+    {
+        super(aInfo, aHandle, aID),
+        BoolValue = aValue;
     }
 
     override void SaveValue(FarDialogItem* Item, int RadioGroupIndex)
@@ -745,14 +774,17 @@ public:
         int Selected = cast(int)(Info.SendDlgMessage(*DialogHandle, FARMESSAGE.DM_GETCHECK, ID, null));
         if (!Mask)
         {
-            *Value = Selected;
+            if (IntValue)
+                *IntValue = Selected;
+            else
+                *BoolValue = Selected != 0;
         }
         else
         {
             if (Selected)
-                *Value |= Mask;
+                *IntValue |= Mask;
             else
-                *Value &= ~Mask;
+                *IntValue &= ~Mask;
         }
     }
 }
@@ -779,10 +811,17 @@ public:
 class PluginEditFieldBinding : DialogAPIBinding
 {
 private:
+    wstring* StrValue;
     wchar* Value;
     int MaxSize;
 
 public:
+    this(in PluginStartupInfo* aInfo, HANDLE* aHandle, int aID, wstring* aValue)
+    {
+        super(aInfo, aHandle, aID);
+        StrValue = aValue;
+    }
+
     this(in PluginStartupInfo* aInfo, HANDLE* aHandle, int aID, wchar* aValue, int aMaxSize)
     {
         super(aInfo, aHandle, aID);
@@ -793,7 +832,10 @@ public:
     override void SaveValue(FarDialogItem* Item, int RadioGroupIndex)
     {
         const(wchar)* DataPtr = cast(const(wchar)*)Info.SendDlgMessage(*DialogHandle, FARMESSAGE.DM_GETCONSTTEXTPTR, ID, null);
-        lstrcpynW(Value, DataPtr, MaxSize);
+        if (StrValue)
+            StrValue = cast(wstring*)DataPtr;
+        else
+            lstrcpynW(Value, DataPtr, MaxSize);
     }
 }
 
@@ -962,6 +1004,11 @@ protected:
         return new PluginCheckBoxBinding(Info, &DialogHandle, m_DialogItemsCount - 1, Value, Mask);
     }
 
+    override DialogItemBinding!FarDialogItem CreateCheckBoxBinding(bool* Value)
+    {
+        return new PluginCheckBoxBinding(Info, &DialogHandle, m_DialogItemsCount - 1, Value);
+    }
+
     override DialogItemBinding!FarDialogItem CreateRadioButtonBinding(BOOL* Value)
     {
         return new PluginRadioButtonBinding(Info, &DialogHandle, m_DialogItemsCount - 1, Value);
@@ -1090,6 +1137,23 @@ public:
         }
 
         SetLastItemBinding(new PluginEditFieldBinding(Info, &DialogHandle, m_DialogItemsCount - 1, Value, MaxSize));
+        return Item;
+    }
+
+    FarDialogItem* AddEditField(wstring* Value, int Width, in wchar* HistoryID = null, bool UseLastHistory = false)
+    {
+        FarDialogItem* Item = AddDialogItem(FARDIALOGITEMTYPES.DI_EDIT, Value.ptr);
+        SetNextY(Item);
+        Item.X2 = Item.X1 + Width - 1;
+        if (HistoryID)
+        {
+            Item.History = HistoryID;
+            Item.Flags |= DIF_HISTORY;
+            if (UseLastHistory)
+                Item.Flags |= DIF_USELASTHISTORY;
+        }
+
+        SetLastItemBinding(new PluginEditFieldBinding(Info, &DialogHandle, m_DialogItemsCount - 1, Value));
         return Item;
     }
 

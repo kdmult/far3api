@@ -23,8 +23,8 @@ unittest
 {
     import std.typetuple;
 
-	foreach (C; TypeTuple!(char, wchar, dchar))
-	{
+    foreach (C; TypeTuple!(char, wchar, dchar))
+    {
         C[5] s;
         s[] = '\0';
         assert(toWString(s) == "\0\0\0\0\0"w);
@@ -69,8 +69,8 @@ unittest
 {
     import std.typetuple;
 
-	foreach (C; TypeTuple!(char, wchar, dchar))
-	{
+    foreach (C; TypeTuple!(char, wchar, dchar))
+    {
         C[5] s;
         s[] = '\0';
         assert(toWStringz(s)[0] == '\0');

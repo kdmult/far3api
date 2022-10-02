@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0.5800.0
+  Plugin API for Far Manager 3.0.6000.0
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 5800;
+const FARMANAGERVERSION_BUILD = 6000;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -21,11 +21,16 @@ const CP_REDETECT   = cast(uintptr_t)-2;
 
 alias FARCOLORFLAGS = ulong;
 const FARCOLORFLAGS
-    FCF_FG_4BIT       = 0x0000000000000001UL,
-    FCF_BG_4BIT       = 0x0000000000000002UL,
-    FCF_4BITMASK      = 0x0000000000000003UL, // FCF_FG_4BIT|FCF_BG_4BIT
+    FCF_FG_INDEX      = 0x0000000000000001UL,
+    FCF_BG_INDEX      = 0x0000000000000002UL,
+    FCF_INDEXMASK     = 0x0000000000000003UL, // FCF_FG_INDEX | FCF_BG_INDEX
 
-    FCF_IGNORE_STYLE  = 0x0000000000000004UL,
+    // Legacy names, don't use
+    FCF_FG_4BIT       = 0x0000000000000001UL, // FCF_FG_INDEX
+    FCF_BG_4BIT       = 0x0000000000000002UL, // FCF_BG_INDEX
+    FCF_4BITMASK      = 0x0000000000000003UL, // FCF_INDEXMASK
+
+    FCF_INHERIT_STYLE = 0x0000000000000004UL,
 
     FCF_RAWATTR_MASK  = 0x000000000000FF00UL, // stored console attributes
 
@@ -37,11 +42,29 @@ const FARCOLORFLAGS
     FCF_FG_STRIKEOUT  = 0x0200000000000000UL,
     FCF_FG_FAINT      = 0x0400000000000000UL,
     FCF_FG_BLINK      = 0x0800000000000000UL,
+    FCF_FG_INVERSE    = 0x0010000000000000UL,
+    FCF_FG_INVISIBLE  = 0x0020000000000000UL,
 
-    FCF_STYLEMASK     = 0xFF00000000000000UL,
+    FCF_STYLEMASK     = 0xFFF0000000000000UL,
     FCF_NONE          = 0UL;
 
-struct rgba { byte r, g, b, a; }
+struct rgba
+{
+    byte
+        r,
+        g,
+        b,
+        a;
+}
+
+struct color_index
+{
+    byte
+        i,
+        reserved0,
+        reserved1,
+        a;
+}
 
 struct FarColor
 {
@@ -49,39 +72,62 @@ struct FarColor
     union
     {
         COLORREF ForegroundColor;
+        color_index ForegroundIndex;
         rgba ForegroundRGBA;
     }
     union
     {
         COLORREF BackgroundColor;
+        color_index BackgroundIndex;
         rgba BackgroundRGBA;
     }
     DWORD[2] Reserved;
 
+    bool IsBgIndex() const
+    {
+        return (Flags & FCF_BG_INDEX) != 0;
+    }
+
+    bool IsFgIndex() const
+    {
+        return (Flags & FCF_FG_INDEX) != 0;
+    }
+
+    FarColor SetBgIndex(bool Value)
+    {
+        Value? Flags |= FCF_BG_INDEX : (Flags &= ~FCF_BG_INDEX);
+        return this;
+    }
+
+    FarColor SetFgIndex(bool Value)
+    {
+        Value? Flags |= FCF_FG_INDEX : (Flags &= ~FCF_FG_INDEX);
+        return this;
+    }
+
+    // Legacy names, don't use
     bool IsBg4Bit() const
     {
-        return (Flags & FCF_BG_4BIT) != 0;
+        return IsBgIndex();
     }
 
     bool IsFg4Bit() const
     {
-        return (Flags & FCF_FG_4BIT) != 0;
+        return IsFgIndex();
     }
 
     FarColor SetBg4Bit(bool Value)
     {
-        Value? Flags |= FCF_BG_4BIT : (Flags &= ~FCF_BG_4BIT);
-        return this;
+        return SetBgIndex(Value);
     }
 
     FarColor SetFg4Bit(bool Value)
     {
-        Value? Flags |= FCF_FG_4BIT : (Flags &= ~FCF_FG_4BIT);
-        return this;
+        return SetFgIndex(Value);
     }
 }
 
-const INDEXMASK = 0x0000000F;
+const INDEXMASK = 0x000000FF;
 const COLORMASK = 0x00FFFFFF;
 const ALPHAMASK = 0xFF000000;
 
@@ -302,7 +348,6 @@ enum FARMESSAGE
     DN_DRAWDIALOG                   = 4101,
     DN_DRAWDLGITEM                  = 4102,
     DN_EDITCHANGE                   = 4103,
-    DN_ENTERIDLE                    = 4104,
     DN_GOTFOCUS                     = 4105,
     DN_HELP                         = 4106,
     DN_HOTKEY                       = 4107,

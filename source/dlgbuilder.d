@@ -1,5 +1,5 @@
 /*
-  Dynamic construction of dialogs for FAR Manager 3.0 build 5577
+  Dynamic construction of dialogs for FAR Manager 3.0 build 6116
 
   Original code: http://farmanager.googlecode.com/svn/trunk/plugins/common/unicode/DlgBuilder.hpp
   License: derived from original one without extra restriction

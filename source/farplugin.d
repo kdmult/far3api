@@ -1,5 +1,5 @@
 /*
-  Plugin API for Far Manager 3.0.6000.0
+  Plugin API for Far Manager 3.0.6116.0
   License: Public Domain
 */
 
@@ -11,7 +11,7 @@ import core.sys.windows.windows;
 const FARMANAGERVERSION_MAJOR = 3;
 const FARMANAGERVERSION_MINOR = 0;
 const FARMANAGERVERSION_REVISION = 0;
-const FARMANAGERVERSION_BUILD = 6000;
+const FARMANAGERVERSION_BUILD = 6116;
 const FARMANAGERVERSION_STAGE = VERSION_STAGE.VS_RELEASE;
 
 const CP_UNICODE    = cast(uintptr_t)1200;
@@ -1387,6 +1387,7 @@ enum DIALOG_EVENTS
 enum SYNCHRO_EVENTS
 {
     SE_COMMONSYNCHRO  =0,
+    SE_FOLDERCHANGED  =1,
 }
 
 const EEREDRAW_ALL   = cast(void*)0;
@@ -1736,6 +1737,7 @@ enum FAR_REGEXP_CONTROL_COMMANDS
     RECTL_MATCHEX                   = 4,
     RECTL_SEARCHEX                  = 5,
     RECTL_BRACKETSCOUNT             = 6,
+    RECTL_NAMEDGROUPINDEX           = 7,
 }
 
 struct RegExpMatch
